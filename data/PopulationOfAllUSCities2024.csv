@@ -1,4 +1,4 @@
-Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mile2),Area (mile2)
+Rank,USCity,USState,Population2024,Population2020,AnnualChange,Density,Area
 1,New York,New York,8097282,8740292,-0.0195,26950,300.46
 2,Los Angeles,California,3795936,3895848,-0.0065,8068,470.52
 3,Chicago,Illinois,2638159,2743329,-0.0099,11584,227.75
@@ -16,7 +16,7 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 15,Columbus,Ohio,915427,906418,0.0025,4147,220.72
 16,Indianapolis (balance),Indiana,876665,887177,-0.003,2428,361.02
 17,San Francisco,California,788478,870518,-0.0254,16884,46.7
-18,Seattle,Washington,759915,740565,0.0064,9047,84.0
+18,Seattle,Washington,759915,740565,0.0064,9047,84
 19,Denver,Colorado,716234,717606,-0.0005,4679,153.07
 20,Oklahoma City,Oklahoma,709330,683078,0.0093,1170,606.48
 21,Nashville (balance),Tennessee,687150,689700,-0.0009,1445,475.57
@@ -40,11 +40,11 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 39,Colorado Springs,Colorado,491441,480331,0.0057,2434,201.87
 40,Raleigh,North Carolina,487942,465354,0.0117,3265,149.45
 41,Omaha,Nebraska,480194,492758,-0.0065,3358,142.98
-42,Miami,Florida,460289,442827,0.0096,12787,36.0
+42,Miami,Florida,460289,442827,0.0096,12787,36
 43,Virginia Beach,Virginia,451637,459684,-0.0044,1846,244.72
 44,Long Beach,California,444095,465585,-0.012,8764,50.67
 45,Oakland,California,435024,440943,-0.0034,7773,55.96
-46,Minneapolis,Minnesota,423250,430710,-0.0044,7838,54.0
+46,Minneapolis,Minnesota,423250,430710,-0.0044,7838,54
 47,Bakersfield,California,416081,405280,0.0065,2769,150.27
 48,Tulsa,Oklahoma,411308,413651,-0.0014,2080,197.76
 49,Tampa,Florida,408510,387924,0.0128,3595,113.64
@@ -73,7 +73,7 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 72,North Las Vegas,Nevada,292623,261214,0.0276,2778,105.32
 73,Jersey City,New Jersey,291559,291949,-0.0003,19769,14.75
 74,Plano,Texas,291450,286408,0.0043,4065,71.7
-75,Anchorage,Alaska,284469,290893,-0.0056,167,1707.0
+75,Anchorage,Alaska,284469,290893,-0.0056,167,1707
 76,Madison,Wisconsin,282005,275204,0.0061,3394,83.09
 77,Chandler,Arizona,281107,277345,0.0034,4283,65.64
 78,Reno,Nevada,278226,264981,0.012,2553,108.99
@@ -91,10 +91,10 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 90,Chesapeake,Virginia,255254,249781,0.0054,754,338.46
 91,Winston-Salem,North Carolina,254032,249804,0.0042,1902,133.58
 92,Irving,Texas,253561,256807,-0.0032,3786,66.98
-93,Scottsdale,Arizona,245231,241883,0.0034,1333,184.0
+93,Scottsdale,Arizona,245231,241883,0.0034,1333,184
 94,Garland,Texas,242523,246311,-0.0039,4265,56.86
-95,Enterprise,Nevada,236331,214591,0.0235,3581,66.0
-96,Arlington,Virginia,236007,236434,0.0003,9078,26.0
+95,Enterprise,Nevada,236331,214591,0.0235,3581,66
+96,Arlington,Virginia,236007,236434,0.0003,9078,26
 97,Boise,Idaho,235216,236034,-0.0009,2782,84.55
 98,Cape Coral,Florida,234132,195422,0.0431,2206,106.12
 99,Frisco,Texas,232424,202754,0.033,3389,68.59
@@ -146,7 +146,7 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 145,Fort Lauderdale,Florida,184709,182892,0.0025,5341,34.58
 146,Ontario,California,184705,175712,0.0123,3695,49.98
 147,Glendale,California,184088,195934,-0.0158,6040,30.48
-148,Newport News,Virginia,182141,186047,-0.0053,2640,69.0
+148,Newport News,Virginia,182141,186047,-0.0053,2640,69
 149,Cary,North Carolina,181754,174778,0.0097,3023,60.13
 150,Mobile,Alabama,181253,186621,-0.0073,1299,139.48
 151,Elk Grove,California,179069,176569,0.0035,4203,42.6
@@ -190,7 +190,7 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 189,Escondido,California,147158,151014,-0.0065,3940,37.35
 190,Gainesville,Florida,147001,142245,0.0081,2297,63.99
 191,Mesquite,Texas,146547,149627,-0.0052,2985,49.1
-192,Waco,Texas,146241,140541,0.0098,1607,91.0
+192,Waco,Texas,146241,140541,0.0098,1607,91
 193,Visalia,California,146073,141771,0.0074,3827,38.17
 194,Thornton,Colorado,145834,142185,0.0063,3995,36.5
 195,Rockford,Illinois,145270,148670,-0.0058,2232,65.08
@@ -245,7 +245,7 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 244,The Woodlands,Texas,122272,114532,0.0161,2826,43.27
 245,Billings,Montana,122077,117224,0.01,2679,45.57
 246,Vallejo,California,121778,125894,-0.0084,4001,30.43
-247,Lafayette,Louisiana,121471,121455,0.0,2169,56.02
+247,Lafayette,Louisiana,121471,121455,0,2169,56.02
 248,Concord,California,121324,125286,-0.0081,3969,30.57
 249,Fairfield,California,121079,119833,0.0026,2912,41.59
 250,Broken Arrow,Oklahoma,120949,113928,0.0147,1921,62.96
@@ -254,7 +254,7 @@ Rank,US City,US State,Population 2024,Population 2020,Annual Change,Density (/mi
 253,Spring Hill,Florida,120022,113742,0.0132,2003,59.92
 254,Hartford,Connecticut,119626,119798,-0.0004,6883,17.38
 255,Nampa,Idaho,118587,101310,0.0378,3410,34.77
-256,Cambridge,Massachusetts,118212,118218,0.0,18479,6.4
+256,Cambridge,Massachusetts,118212,118218,0,18479,6.4
 257,Ann Arbor,Michigan,117971,123611,-0.0118,4164,28.33
 258,Antioch,California,117668,115379,0.0049,4034,29.17
 259,High Point,North Carolina,117619,114846,0.0059,2052,57.33
