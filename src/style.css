@@ -1,10 +1,94 @@
 body {
-    background: #6e28d9;
-    padding: 0 24px;
-    margin: 0;
-    height: 100vh;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  background: #f0ebf7;
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+  color: black; /* Changed from white for visibility on light background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* Align items vertically */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* title */
+.title {
+  text-align: center;
+  margin-top: 20px;
+}
+.subtitle {
+  text-align: center;
+  color: gray;
+  font-size: 14px;
+  margin-bottom: 30px; 
+}
+
+
+/* button */
+.flex-container {
+  display: flex; 
+  /* align-items: flex-start; */
+  justify-content: space-around; 
+  /* justify-content: flex-start; */
+  width: 100%;
+  margin-bottom: 10px; 
+}
+.button-container {
+  text-align: center;
+  margin: 5px;
+  display: block;
+}
+.nested-buttons {
+  margin-top: 5px;
+}
+button {
+    margin: 2px;
+    padding: 5px;
+}
+
+/* svg */
+.svg-container {
+  display: flex;
+  width: 100%; 
+}
+.svg1 {
+  flex: 7; 
+  border: 1px solid black; 
+}
+.svg1_region {
+  flex: 3; 
+  border: 1px solid black; 
+}
+
+.svg-container2 {
+  width: 70%; 
+  margin: auto; 
+  border: 1px solid rgb(118, 118, 118); 
+  margin-top: 20px;
+}
+
+svg {
+  display: block; 
+  width: 100%; 
+  height: auto;  
+  padding-top: (500 / 960) * 100%;
+  background-color: white; 
+}
+
+
+circle {
+  fill: lightblue;
+  stroke: #d8c6f1;
+} 
+
+.annotation-note-title, text.title {
+  font-weight: bold;
+}  
+text.title {
+  font-size: 1.2em;
+}
