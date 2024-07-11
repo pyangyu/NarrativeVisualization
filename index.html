@@ -1,1 +1,97 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/style.css">
+
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+    <style> circle {fill: lightblue; stroke: black;} </style>
+    <body onload='init()'>
+    <svg width=300 height=300>
+    </svg>
+    <script>
+    async function init() {
+
+
+
+
+
+
+
+
+    const data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
+        
+    // const data = await d3.csv('data/PopulationOfAllUSCities2024.csv', function(d) {
+    //     return {
+    //         rank: +d.Rank,
+    //         city: d.USCity,
+    //         state: d.USState,
+    //         population2024: +d.Population2024,
+    //         population2020: +d.Population2020,
+    //         annualChange: +d.AnnualChange,
+    //         density: +d.Density,
+    //         area: +d.Area
+    //     };
+    // });
+
+        
+
+      // const metrics = ['rank', 'population2024', 'population2020', 'annualChange', 'density', 'area'];
+      // const stats = metrics.map(metric => ({
+      //     name: metric,
+      //     min: d3.min(data, d => d[metric]),
+      //     max: d3.max(data, d => d[metric])
+      // }));
+
+      // d3.select("body").selectAll('h2')
+      //    .data(stats)
+      //    .enter()
+      //    .append('h3')
+      //    .text(d => `Metric: ${d.name}, Min: ${d.min}, Max: ${d.max}`);
+      
+      var svg = d3.select("svg");
+
+      var x = d3.scaleLog()
+                .range([0, 200]) // Width of the SVG minus margins
+                .domain([100000, 9000000]); // Log scale from 100,000 to 9,000,000
+
+      var y = d3.scaleLog()
+                .range([200, 0]) // Height of the SVG, inverted for y-axis
+                .domain([100000, 9000000]); // Same for y, as populations are similarly ranged
+
+      var gPoints = svg.append("g")
+                       .attr("transform", "translate(50, 50)"); // Apply transformation for margin
+
+
+      gPoints.selectAll(".circle")
+        .data(data)
+        .enter().append("circle")
+        .attr("cx", function(d) { return x(d.Population2024); })
+        .attr("cy", function(d) { return y(d.Population2020); })
+        .attr("r", function(d) { return 10; });
+
+
+        // Append and transform the y-axis group
+        var gYAxes = svg.append("g")
+                       .attr("transform", "translate(50, 50)") // Position y-axis group correctly
+                       .call(d3.axisLeft(y)
+                          .tickValues([100000, 1000000, 9000000]) // Specific ticks for clarity
+                          .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
+
+        // Append and transform the x-axis group at the bottom
+        var gXAxes = svg.append("g")
+                       .attr("transform", "translate(" + 50 + "," + 250 + ")")
+                       .call(d3.axisBottom(x)
+                          .tickValues([100000, 1000000, 9000000]) // Matching tick values
+                          .tickFormat(d3.format(".0s"))); // Same format as y-axis
+
+
+
+
+
+
+                          
+}
+</script>
+</body>
+</html>
