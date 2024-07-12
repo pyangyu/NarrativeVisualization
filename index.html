@@ -2,9 +2,12 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="src/style.css">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="src/style.css">
+        <script src='https://d3js.org/d3.v5.min.js'></script>
+    </head>
 
     <script src='https://d3js.org/d3.v5.min.js'></script>
     <body onload='init()'>
@@ -195,7 +198,7 @@
             .attr("cx", function(d) { return x2(d.Population2024); })
             .attr("cy", function(d) { return y2(d.Population2020); })
             .attr("r", function(d) { return 5; })
-            .transition().duration(4000).delay(3000)
+            .transition().duration(3000).delay(1000)
             .attr("r", function(d) { return 10; });
         
         var gYAxes2 = svg2.append("g")
@@ -234,6 +237,8 @@
       
         var svg2 = d3.select("svg.svg2");
 
+        svg2.selectAll("circle").remove(); // Removes all circles within the SVG
+
         var x2 = d3.scaleLog()
                   .range([0, 860]) 
                   .domain([100000, 9000000]); 
@@ -246,13 +251,13 @@
                          .attr("transform", "translate(50, 50)"); 
 
         gPoints2.selectAll(".circle")
-            .data(data) 
+            .data(filteredData) 
             .enter().append("circle")
             .attr("cx", function(d) { return x2(d.Population2024); })
             .attr("cy", function(d) { return y2(d.Population2020); })
             .attr("r", function(d) { return 5; })
-            .transition().duration(4000).delay(3000)
-            .attr("r", function(d) { return 10; });
+            .transition().duration(3000).delay(1000)
+            .attr("r", function(d) { return 80; });
 
         var gYAxes2 = svg2.append("g")
             .attr("transform", "translate(" + 50 + "," + 50 + ")")
@@ -269,39 +274,20 @@
   
 
     function logRegion(regionName) {
-      let filteredData;
-      switch (regionName) {
-          case 'Western States':
-              filteredData = filterByRegion(westernStates);
-              break;
-          case 'Pacific States':
-              filteredData = filterByRegion(pacificStates);
-              break;
-          case 'Mountain States':
-              filteredData = filterByRegion(mountainStates);
-              break;
-          case 'Midwestern States':
-              filteredData = filterByRegion(midwesternStates);
-              break;
-          case 'East North Central':
-              filteredData = filterByRegion(eastNorthCentral);
-              break;
-          case 'West North Central':
-              filteredData = filterByRegion(westNorthCentral);
-              break;
-          case 'Eastern States':
-              filteredData = filterByRegion(easternStates);
-              break;
-          case 'Northeast':
-              filteredData = filterByRegion(northeast);
-              break;
-          case 'South':
-              filteredData = filterByRegion(south);
-              break;
-          default:
-              filteredData = original_data;
-      }
-      update00Visualization(filteredData);
+        const regions = {
+            'Western States': [...pacificStates, ...mountainStates],
+            'Pacific States': pacificStates,
+            'Mountain States': mountainStates,
+            'Midwestern States': [...eastNorthCentral, ...westNorthCentral],
+            'East North Central': eastNorthCentral,
+            'West North Central': westNorthCentral,
+            'Eastern States': [...northeast, ...south],
+            'Northeast': northeast,
+            'South': south
+        };
+
+        const filteredData = filterByRegion(regions[regionName]);
+        updateVisualization(filteredData);
     }
 </script>
 </body>
