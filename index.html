@@ -12,6 +12,9 @@
           <h1 class="title">Population Of All popular US Cities</h1>
           <h2 class="subtitle">Explore demographic trends across different cities</h2>
       </div>
+      <div class="clear_button">
+        <button onclick="clearData()">Clear</button>
+      </div>
       <div class="flex-container">
         <div class="button-container">
             <button onclick="logRegion('Western States')">Western States</button>
@@ -45,72 +48,63 @@
           <!-- SVG inside a div that controls the size -->
           <svg class="svg2" viewBox="0 0 960 500"></svg>
       </div>
-    <script>
+
+
+      <!-- tooltip -->
+       <div id="tooltip" class="tooltip"></div>
+       
+<script>
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                          //
+    //                                              Define state groups                                         //
+    //                                                                                                          //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const pacificStates = ["California", "Oregon", "Washington", "Alaska", "Hawaii"];
+    const mountainStates = ["Arizona", "Nevada", "New Mexico", "Utah", "Colorado", "Idaho", "Montana", "Wyoming"];
+    const westernStates = [...pacificStates, ...mountainStates];
+
+    const eastNorthCentral = ["Ohio", "Indiana", "Michigan", "Illinois", "Wisconsin"];
+    const westNorthCentral = ["Missouri", "North Dakota", "South Dakota", "Nebraska", "Kansas", "Minnesota", "Iowa"];
+    const midwesternStates = [...eastNorthCentral, ...westNorthCentral];
+
+    const northeast = ["Maine", "New Hampshire", "Vermont", "Massachusetts", "Rhode Island", "Connecticut", "New York", "New Jersey", "Pennsylvania"];
+    const south = ["Delaware", "Maryland", "Virginia", "West Virginia", "North Carolina", "South Carolina", "Georgia", "Florida", "Kentucky", "Tennessee", "Alabama", "Mississippi"];
+    const easternStates = [...northeast, ...south];
+
+    let original_data = [];
+
     async function init() {
-
-      function logRegion(regionName) {
-        console.log("Clicked on: " + regionName);
-      }
-      // const data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv', function(d) {
-      //     return {
-      //         rank: +d.Rank,
-      //         city: d.USCity,
-      //         state: d.USState,
-      //         population2024: +d.Population2024,
-      //         population2020: +d.Population2020,
-      //         annualChange: +d.AnnualChange,
-      //         density: +d.Density,
-      //         area: +d.Area
-      //     };
-      // });
-      const data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
-          
-      // const metrics = ['rank', 'population2024', 'population2020', 'annualChange', 'density', 'area'];
-      // const stats = metrics.map(metric => ({
-      //     name: metric,
-      //     min: d3.min(data, d => d[metric]),
-      //     max: d3.max(data, d => d[metric])
-      // }));
-
-      // d3.select("body").selectAll('h2')
-      //    .data(stats)
-      //    .enter()
-      //    .append('h3')
-      //    .text(d => `Metric: ${d.name}, Min: ${d.min}, Max: ${d.max}`);
-
-
-
-
-
-
-
+      original_data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
+      let data = original_data;
 
 
       // region
 
       var svg_r = d3.select("svg.svg1_region"); 
       var data_region = [
-          { region: "Africa | North & East", color: "#FFD700" },
-          { region: "Africa | South & West", color: "#FF8C00" },
-          { region: "America | North & Central", color: "#ADFF2F" },
-          { region: "America | South", color: "#4B0082" },
-          { region: "Asia | East & Central", color: "#F08080" },
-          { region: "Asia | South & West", color: "#90EE90" },
-          { region: "Europe | North & West", color: "#ADD8E6" },
-          { region: "Europe | South & East", color: "#E0FFFF" },
-          { region: "Oceania", color: "#20B2AA" },
+          { region: "Western States", color: "#FFD700" },
+          { region: "Pacific States", color: "#FF8C00" },
+          { region: "Mountain States", color: "#ADFF2F" },
+          { region: "Midwestern States", color: "#4B0082" },
+          { region: "East North Central", color: "#F08080" },
+          { region: "West North Central", color: "#90EE90" },
+          { region: "Eastern States", color: "#ADD8E6" },
+          { region: "Northeast", color: "#E0FFFF" },
+          { region: "South", color: "#20B2AA" },
       ];
 
       // Create Legend
       var legend = svg_r.append("g")
                       .attr("class", "legend")
-                      .attr("transform", "translate(50, 50)");  // Adjust the position according to your SVG dimensions
+                      .attr("transform", "translate(50, 50)"); 
 
       legend.selectAll("rect")
             .data(data_region)
             .enter().append("rect")
-            .attr("x", 0)
-            .attr("y", function(d, i) { return i * 24; })  // Space rectangles
+            .attr("x", function(d,i) {if(i % 3 == 2 || i % 3 == 1) return 25; return 0;})
+            .attr("y", function(d, i) { return i * 24; }) 
             .attr("width", 18)
             .attr("height", 18)
             .style("fill", function(d) { return d.color; });
@@ -118,11 +112,10 @@
       legend.selectAll("text")
             .data(data_region)
             .enter().append("text")
-            .attr("x", 24)
+            .attr("x", function(d,i) {if(i % 3 == 2 || i % 3 == 1) return 50; return 25;})
             .attr("y", function(d, i) { return i * 24 + 14; })
             .text(function(d) { return d.region; });
 
-      // Optionally add title to the legend
       legend.append("text")
             .attr("x", 0)
             .attr("y", -10)
@@ -130,97 +123,186 @@
             .text("Region");
 
 
+            
+
 
       var svg = d3.select("svg.svg1"); 
 
       var x = d3.scaleLog()
-                .range([0, 860]) // Width of the SVG minus margins
-                .domain([100000, 9000000]); // Log scale from 100,000 to 9,000,000
+                .range([0, 860]) 
+                .domain([6, 1500]); 
 
       var y = d3.scaleLog()
-                .range([400, 0]) // Height of the SVG, inverted for y-axis
-                .domain([100000, 9000000]); // Same for y, as populations are similarly ranged
-
+                .range([400, 0]) 
+                .domain([90000, 7000000]); 
       var gPoints = svg.append("g")
-                       .attr("transform", "translate(50, 50)"); // Apply transformation for margin
+                       .attr("transform", "translate(50, 50)"); 
+
+      var tooltip = d3.select("#tooltip");
 
       gPoints.selectAll(".circle")
         .data(data)
         .enter().append("circle")
-        .attr("cx", function(d) { return x(d.Population2024); })
-        .attr("cy", function(d) { return y(d.Population2020); })
-        .attr("r", function(d) { return 5; })
+        .attr("cx", function(d) { return x(d.Area); })
+        .attr("cy", function(d) { return y(d.Population2024); })
+        .attr("r", function(d) { return 2; })
+        .on('mouseover', function(d,i) {
+          tooltip.style("opacity", 0.8)
+                 .style("left", (d3.event.pageX) + "px")
+                 .style("top", (d3.event.pageY) + "px")
+                 .html(d.USCity + '\n' + d.USState + '\n' + d.Density)
+        })
+        //.on('mousemove', function(d,i) {
+        //})
+        .on('mouseout', function() {
+          tooltip.style("opacity", 0)
+        })
         .transition().duration(3000).delay(1000)
-        .attr("r", function(d) { return 10; });
+        .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
 
-        // Append and transform the y-axis group
         var gYAxes = svg.append("g")
-                       .attr("transform", "translate(" + 50 + "," + 50 + ")") // Position y-axis group correctly
+                       .attr("transform", "translate(" + 50 + "," + 50 + ")")
                        .call(d3.axisLeft(y)
-                          .tickValues([100000, 1000000, 9000000]) // Specific ticks for clarity
                           .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
 
-        // Append and transform the x-axis group at the bottom
         var gXAxes = svg.append("g")
                        .attr("transform", "translate(" + 50 + "," + 450 + ")")
                        .call(d3.axisBottom(x)
-                          .tickValues([100000, 1000000, 9000000]) // Matching tick values
-                          .tickFormat(d3.format(".0s"))); // Same format as y-axis
+                          .tickFormat(d3.format(".0s"))); 
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-        var svg2 = d3.select("svg.svg2"); // Select the svg with class "svg2"
+                          
+        var svg2 = d3.select("svg.svg2");
 
         var x2 = d3.scaleLog()
-                  .range([0, 860]) // Width of the SVG minus margins
-                  .domain([100000, 9000000]); // Log scale from 100,000 to 9,000,000
+                  .range([0, 860]) 
+                  .domain([100000, 9000000]); 
 
         var y2 = d3.scaleLog()
-                  .range([400, 0]) // Height of the SVG, inverted for y-axis
-                  .domain([100000, 9000000]); // Same for y, as populations are similarly ranged
+                  .range([400, 0]) 
+                  .domain([100000, 9000000]); 
 
         var gPoints2 = svg2.append("g")
-                         .attr("transform", "translate(50, 50)"); // Apply transformation for margin
+                         .attr("transform", "translate(50, 50)"); 
 
         gPoints2.selectAll(".circle")
-            .data(data) // Make sure your data is defined or loaded before this script runs
+            .data(data) 
             .enter().append("circle")
-            .attr("cx", function(d) { return x(d.Population2024); })
-            .attr("cy", function(d) { return y(d.Population2020); })
+            .attr("cx", function(d) { return x2(d.Population2024); })
+            .attr("cy", function(d) { return y2(d.Population2020); })
+            .attr("r", function(d) { return 5; })
+            .transition().duration(4000).delay(3000)
+            .attr("r", function(d) { return 10; });
+        
+        var gYAxes2 = svg2.append("g")
+                       .attr("transform", "translate(50, 50)") 
+                       .call(d3.axisLeft(y2)
+                          .tickValues([100000, 1000000, 9000000]) 
+                          .tickFormat(d3.format(".0s"))); 
+
+        var gXAxes2 = svg2.append("g")
+                       .attr("transform", "translate(50, 450)")
+                       .call(d3.axisBottom(x2)
+                          .tickValues([100000, 1000000, 9000000]) 
+                          .tickFormat(d3.format(".0s"))); 
+
+        var gYAxes2 = svg2.append("g")
+            .attr("transform", "translate(" + 50 + "," + 50 + ")")
+            .call(d3.axisLeft(y2)
+            //.tickValues([100000, 1000000, 9000000]) 
+            .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
+
+        var gXAxes2 = svg2.append("g")
+            .attr("transform", "translate(" + 50 + "," + 450 + ")")
+            .call(d3.axisBottom(x2)
+            //.tickValues([100000, 1000000, 9000000]) 
+            .tickFormat(d3.format(".0s"))); 
+
+    }
+
+    function filterByRegion(regionStates) {
+      return original_data.filter(d => regionStates.includes(d.USState));
+    }
+
+    async function updateVisualization(filteredData) {
+        filteredData = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
+      
+      
+        var svg2 = d3.select("svg.svg2");
+
+        var x2 = d3.scaleLog()
+                  .range([0, 860]) 
+                  .domain([100000, 9000000]); 
+
+        var y2 = d3.scaleLog()
+                  .range([400, 0]) 
+                  .domain([100000, 9000000]); 
+
+        var gPoints2 = svg2.append("g")
+                         .attr("transform", "translate(50, 50)"); 
+
+        gPoints2.selectAll(".circle")
+            .data(data) 
+            .enter().append("circle")
+            .attr("cx", function(d) { return x2(d.Population2024); })
+            .attr("cy", function(d) { return y2(d.Population2020); })
             .attr("r", function(d) { return 5; })
             .transition().duration(4000).delay(3000)
             .attr("r", function(d) { return 10; });
 
-        // Append and transform the y-axis group
         var gYAxes2 = svg2.append("g")
-                       .attr("transform", "translate(50, 50)") // Position y-axis group correctly
-                       .call(d3.axisLeft(y2)
-                          .tickValues([100000, 1000000, 9000000]) // Specific ticks for clarity
-                          .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
+            .attr("transform", "translate(" + 50 + "," + 50 + ")")
+            .call(d3.axisLeft(y2)
+            //.tickValues([100000, 1000000, 9000000]) 
+            .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
 
-        // Append and transform the x-axis group at the bottom
         var gXAxes2 = svg2.append("g")
-                       .attr("transform", "translate(50, 450)")
-                       .call(d3.axisBottom(x2)
-                          .tickValues([100000, 1000000, 9000000]) // Matching tick values
-                          .tickFormat(d3.format(".0s"))); // Same format as y-axis
+            .attr("transform", "translate(" + 50 + "," + 450 + ")")
+            .call(d3.axisBottom(x2)
+            //.tickValues([100000, 1000000, 9000000]) 
+            .tickFormat(d3.format(".0s"))); 
+    }
+  
 
-}
+    function logRegion(regionName) {
+      let filteredData;
+      switch (regionName) {
+          case 'Western States':
+              filteredData = filterByRegion(westernStates);
+              break;
+          case 'Pacific States':
+              filteredData = filterByRegion(pacificStates);
+              break;
+          case 'Mountain States':
+              filteredData = filterByRegion(mountainStates);
+              break;
+          case 'Midwestern States':
+              filteredData = filterByRegion(midwesternStates);
+              break;
+          case 'East North Central':
+              filteredData = filterByRegion(eastNorthCentral);
+              break;
+          case 'West North Central':
+              filteredData = filterByRegion(westNorthCentral);
+              break;
+          case 'Eastern States':
+              filteredData = filterByRegion(easternStates);
+              break;
+          case 'Northeast':
+              filteredData = filterByRegion(northeast);
+              break;
+          case 'South':
+              filteredData = filterByRegion(south);
+              break;
+          default:
+              filteredData = original_data;
+      }
+      update00Visualization(filteredData);
+    }
 </script>
 </body>
 </html>
