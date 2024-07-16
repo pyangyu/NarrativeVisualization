@@ -87,7 +87,7 @@
 
       var svg_r = d3.select("svg.svg1_region"); 
       var data_region = [
-          { region: "Western States", color: "#FFD700" },
+          { region: "Western States", color: "#2222D2" },
           { region: "Pacific States", color: "#FF8C00" },
           { region: "Mountain States", color: "#ADFF2F" },
           { region: "Midwestern States", color: "#4B0082" },
@@ -149,6 +149,7 @@
         .attr("cx", function(d) { return x(d.Area); })
         .attr("cy", function(d) { return y(d.Population2024); })
         .attr("r", function(d) { return 2; })
+        .attr("fill", function(d) {return checkCity(d.USState);})
         .on('mouseover', function(d,i) {
           tooltip.style("opacity", 0.8)
                  .style("left", (d3.event.pageX) + "px")
@@ -270,6 +271,31 @@
             .call(d3.axisBottom(x2)
             //.tickValues([100000, 1000000, 9000000]) 
             .tickFormat(d3.format(".0s"))); 
+    }
+
+
+    function checkCity(cityState) {
+      const regions = {
+        'Western States': [...pacificStates, ...mountainStates],
+        'Midwestern States': [...eastNorthCentral, ...westNorthCentral],
+        'Eastern States': [...northeast, ...south]
+      };
+      let color = '#CFD5A0';
+      
+      if(regions['Western States'].includes(cityState)) {
+        color = '#2222D2';
+        return color;
+      }
+      if(regions['Midwestern States'].includes(cityState)) {
+        color = '#1EB50D';
+        return color;
+      }
+      if(regions['Eastern States'].includes(cityState)) {
+        color = '#CB1522';
+        return color;
+      }
+
+      return color;
     }
   
 
