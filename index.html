@@ -49,12 +49,14 @@
 
       <div class="svg-container2">
           <!-- SVG inside a div that controls the size -->
-          <svg class="svg2" viewBox="0 0 960 500"></svg>
+          <svg class="svg2" viewBox="0 0 960 4500"></svg>
+          <svg class="svg2_region"></svg>
       </div>
 
 
       <!-- tooltip -->
        <div id="tooltip" class="tooltip"></div>
+       <div id="tooltip2" class="tooltip2"></div>
        
 <script>
 
@@ -83,6 +85,11 @@
       let data = original_data;
 
 
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //                                                                                                          //
+      //                                              Define svg1 graph                                           //
+      //                                                                                                          //
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // region
 
       var svg_r = d3.select("svg.svg1_region"); 
@@ -90,10 +97,10 @@
           { region: "Western States", color: "#2222D2" },
           { region: "Pacific States", color: "#FF8C00" },
           { region: "Mountain States", color: "#ADFF2F" },
-          { region: "Midwestern States", color: "#4B0082" },
+          { region: "Midwestern States", color: "#1EB50D" },
           { region: "East North Central", color: "#F08080" },
           { region: "West North Central", color: "#90EE90" },
-          { region: "Eastern States", color: "#ADD8E6" },
+          { region: "Eastern States", color: "#CB1522" },
           { region: "Northeast", color: "#E0FFFF" },
           { region: "South", color: "#20B2AA" },
       ];
@@ -123,10 +130,7 @@
             .attr("x", 0)
             .attr("y", -10)
             .attr("font-weight", "bold")
-            .text("Region");
-
-
-            
+            .text("Region");        
 
 
       var svg = d3.select("svg.svg1"); 
@@ -178,53 +182,102 @@
 
 
 
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //                                                                                                          //
+      //                                              Define svg2 graph                                           //
+      //                                                                                                          //
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                          
-        var svg2 = d3.select("svg.svg2");
+      // region
+      var svg_r2 = d3.select("svg.svg2_region"); 
+      var data_region2 = [
+          { region: "Increase", color: "#028017" },
+          { region: "Decrease", color: "#A51505" }
+      ];
 
-        var x2 = d3.scaleLog()
-                  .range([0, 860]) 
-                  .domain([100000, 9000000]); 
+      // Create Legend
+      var legend2 = svg_r2.append("g")
+                      .attr("class", "legend")
+                      .attr("transform", "translate(50, 50)"); 
 
-        var y2 = d3.scaleLog()
-                  .range([400, 0]) 
-                  .domain([100000, 9000000]); 
+      legend2.selectAll("rect")
+            .data(data_region2)
+            .enter().append("rect")
+            .attr("x", 0)
+            .attr("y", function(d, i) { return i * 24; }) 
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", function(d) { return d.color; });
 
-        var gPoints2 = svg2.append("g")
-                         .attr("transform", "translate(50, 50)"); 
+      legend2.selectAll("text")
+            .data(data_region2)
+            .enter().append("text")
+            .attr("x", 25)
+            .attr("y", function(d, i) { return i * 24 + 14; })
+            .text(function(d) { return d.region; });
 
-        gPoints2.selectAll(".circle")
-            .data(data) 
-            .enter().append("circle")
-            .attr("cx", function(d) { return x2(d.Population2024); })
-            .attr("cy", function(d) { return y2(d.Population2020); })
-            .attr("r", function(d) { return 5; })
-            .transition().duration(3000).delay(1000)
-            .attr("r", function(d) { return 10; });
-        
-        var gYAxes2 = svg2.append("g")
-                       .attr("transform", "translate(50, 50)") 
-                       .call(d3.axisLeft(y2)
-                          .tickValues([100000, 1000000, 9000000]) 
-                          .tickFormat(d3.format(".0s"))); 
+      legend2.append("text")
+            .attr("x", 0)
+            .attr("y", -10)
+            .attr("font-weight", "bold")
+            .text("Region");      
 
-        var gXAxes2 = svg2.append("g")
-                       .attr("transform", "translate(50, 450)")
-                       .call(d3.axisBottom(x2)
-                          .tickValues([100000, 1000000, 9000000]) 
-                          .tickFormat(d3.format(".0s"))); 
+                        
+      var svg2 = d3.select("svg.svg2");
 
-        var gYAxes2 = svg2.append("g")
-            .attr("transform", "translate(" + 50 + "," + 50 + ")")
-            .call(d3.axisLeft(y2)
-            //.tickValues([100000, 1000000, 9000000]) 
-            .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
+      var x2_positive = d3.scaleLinear()
+                .range([0, 430]) 
+                .domain([0, 0.06]);
 
-        var gXAxes2 = svg2.append("g")
-            .attr("transform", "translate(" + 50 + "," + 450 + ")")
-            .call(d3.axisBottom(x2)
-            //.tickValues([100000, 1000000, 9000000]) 
-            .tickFormat(d3.format(".0s"))); 
+      var x2 = d3.scaleLinear()
+                .range([0, 860]) 
+                .domain([-0.06, 0.06]); 
+
+      var y2 = d3.scaleBand()
+                .range([4400, 0]) 
+                .domain(data.map(function(d) {return d.USCity;}))
+                .padding(0.1); 
+
+      var gPoints2 = svg2.append("g")
+                        .attr("transform", "translate(50, 50)"); 
+
+      gPoints2.selectAll(".rect")
+          .data(data) 
+          .enter().append("rect")
+          .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
+          .attr("y", function(d) { return y2(d.USCity); })
+          .attr("width", function(d) { return 0; })
+          .on('mouseover', function(d,i) {
+            tooltip.style("opacity", 0.8)
+                   .style("left", (d3.event.pageX) + "px")
+                   .style("top", (d3.event.pageY) + "px")
+                   .html(d.AnnualChange)
+          })
+          .on('mouseout', function() {
+            tooltip.style("opacity", 0)
+          })
+          .transition().duration(3000).delay(1000)
+          .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
+          .attr("height", y2.bandwidth())
+          .attr("r", function(d) { return 10; })
+          .attr("fill", function(d) {if(d.AnnualChange < 0) return "#A51505"; return "#028017";});
+      
+      var gYAxes2 = svg2.append("g")
+                      .attr("transform", "translate(480, 50)") 
+                      .call(d3.axisLeft(y2).tickPadding(10) 
+                                        .tickSize(0));
+
+
+      var gXAxes2 = svg2.append("g")
+          .attr("transform", "translate(50, 42)") 
+          .call(d3.axisBottom(x2)
+              .tickFormat(d3.format(".0s")) 
+              .tickSizeInner(8) 
+              .tickSizeOuter(0)); 
+
+      gXAxes2.selectAll(".tick text")
+          .attr("y", -10) 
+          .style("text-anchor", "middle"); 
 
     }
 
@@ -233,44 +286,37 @@
     }
 
     async function updateVisualization(filteredData) {
-        filteredData = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
+        // filteredData = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
       
       
-        var svg2 = d3.select("svg.svg2");
+        var svg1 = d3.select("svg.svg1");
 
-        svg2.selectAll("circle").remove(); // Removes all circles within the SVG
+        // svg1.selectAll("circle").remove();
 
-        var x2 = d3.scaleLog()
-                  .range([0, 860]) 
-                  .domain([100000, 9000000]); 
+        var gPoints = svg.append("g")
+                        .attr("transform", "translate(50, 50)"); 
 
-        var y2 = d3.scaleLog()
-                  .range([400, 0]) 
-                  .domain([100000, 9000000]); 
+        var tooltip = d3.select("#tooltip");
 
-        var gPoints2 = svg2.append("g")
-                         .attr("transform", "translate(50, 50)"); 
+        gPoints.selectAll(".circle")
+          .data(filteredData)
+          .enter().append("circle")
+          .attr("cx", function(d) { return x(d.Area); })
+          .attr("cy", function(d) { return y(d.Population2024); })
+          .attr("r", function(d) { return 2; })
+          .attr("fill", function(d) {return checkCity(d.USState);})
+          .on('mouseover', function(d,i) {
+            tooltip.style("opacity", 0.8)
+                  .style("left", (d3.event.pageX) + "px")
+                  .style("top", (d3.event.pageY) + "px")
+                  .html(d.USCity + '\n' + d.USState + '\n' + d.Density)
+          })
+          .on('mouseout', function() {
+            tooltip.style("opacity", 0)
+          })
+          .transition().duration(3000).delay(1000)
+          .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
 
-        gPoints2.selectAll(".circle")
-            .data(filteredData) 
-            .enter().append("circle")
-            .attr("cx", function(d) { return x2(d.Population2024); })
-            .attr("cy", function(d) { return y2(d.Population2020); })
-            .attr("r", function(d) { return 5; })
-            .transition().duration(3000).delay(1000)
-            .attr("r", function(d) { return 80; });
-
-        var gYAxes2 = svg2.append("g")
-            .attr("transform", "translate(" + 50 + "," + 50 + ")")
-            .call(d3.axisLeft(y2)
-            //.tickValues([100000, 1000000, 9000000]) 
-            .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
-
-        var gXAxes2 = svg2.append("g")
-            .attr("transform", "translate(" + 50 + "," + 450 + ")")
-            .call(d3.axisBottom(x2)
-            //.tickValues([100000, 1000000, 9000000]) 
-            .tickFormat(d3.format(".0s"))); 
     }
 
 
