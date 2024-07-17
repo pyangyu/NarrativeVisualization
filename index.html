@@ -40,6 +40,13 @@
                 <button onclick="logRegion('South')">South</button>
             </div>
         </div>
+        <div class="button-container">
+          <button onclick="logRegion('Southern States')">Southern States</button>
+          <div class="nested-buttons">
+              <button onclick="logRegion('East South Central')">East South Central</button>
+              <button onclick="logRegion('West South Central')">West South Central</button>
+          </div>
+      </div>
       </div>
       <div class="svg-container">
           <!-- SVG inside a div that controls the size -->
@@ -74,9 +81,16 @@
     const westNorthCentral = ["Missouri", "North Dakota", "South Dakota", "Nebraska", "Kansas", "Minnesota", "Iowa"];
     const midwesternStates = [...eastNorthCentral, ...westNorthCentral];
 
+    const southAtlantic = ["Delaware", "Maryland", "Virginia", "West Virginia", "North Carolina", "South Carolina", "Georgia", "Florida", "District of Columbia"];
+    const eastSouthCentral = ["Kentucky", "Tennessee", "Alabama", "Mississippi"];
+    const westSouthCentral = ["Arkansas", "Louisiana", "Oklahoma", "Texas"];
+    const southernStates = [...southAtlantic, ...eastSouthCentral, ...westSouthCentral];
+
     const northeast = ["Maine", "New Hampshire", "Vermont", "Massachusetts", "Rhode Island", "Connecticut", "New York", "New Jersey", "Pennsylvania"];
-    const south = ["Delaware", "Maryland", "Virginia", "West Virginia", "North Carolina", "South Carolina", "Georgia", "Florida", "Kentucky", "Tennessee", "Alabama", "Mississippi"];
-    const easternStates = [...northeast, ...south];
+    const easternStates = [...northeast, ...southAtlantic]; 
+
+    const usTerritories = ["Puerto Rico", "Guam", "U.S. Virgin Islands", "Northern Mariana Islands", "American Samoa"];
+
 
     let original_data = [];
 
@@ -100,9 +114,12 @@
           { region: "Midwestern States", color: "#1EB50D" },
           { region: "East North Central", color: "#F08080" },
           { region: "West North Central", color: "#90EE90" },
+          { region: "Southern States", color: "#FFF347" },
+          { region: "East South Central", color: "#B496FF" },
+          { region: "West South Central", color: "#23E9A7" },
           { region: "Eastern States", color: "#CB1522" },
           { region: "Northeast", color: "#E0FFFF" },
-          { region: "South", color: "#20B2AA" },
+          { region: "South Atlantic", color: "#20B2AA" },
       ];
 
       // Create Legend
@@ -286,14 +303,21 @@
     }
 
     async function updateVisualization(filteredData) {
-        // filteredData = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
-      
-      
+        // svg1
+
         var svg1 = d3.select("svg.svg1");
 
-        // svg1.selectAll("circle").remove();
+        svg1.selectAll("circle").remove();
 
-        var gPoints = svg.append("g")
+        var x = d3.scaleLog()
+                .range([0, 860]) 
+                .domain([6, 1500]); 
+
+        var y = d3.scaleLog()
+                  .range([400, 0]) 
+                  .domain([90000, 7000000]); 
+                  
+        var gPoints = svg1.append("g")
                         .attr("transform", "translate(50, 50)"); 
 
         var tooltip = d3.select("#tooltip");
@@ -303,7 +327,7 @@
           .enter().append("circle")
           .attr("cx", function(d) { return x(d.Area); })
           .attr("cy", function(d) { return y(d.Population2024); })
-          .attr("r", function(d) { return 2; })
+          .attr("r", function(d) { return 0; })
           .attr("fill", function(d) {return checkCity(d.USState);})
           .on('mouseover', function(d,i) {
             tooltip.style("opacity", 0.8)
@@ -317,6 +341,48 @@
           .transition().duration(3000).delay(1000)
           .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
 
+
+          // svg2
+          /**
+          var svg2 = d3.select("svg.svg2");
+
+          var x2_positive = d3.scaleLinear()
+                    .range([0, 430]) 
+                    .domain([0, 0.06]);
+
+          var x2 = d3.scaleLinear()
+                    .range([0, 860]) 
+                    .domain([-0.06, 0.06]); 
+
+          var y2 = d3.scaleBand()
+                    .range([4400, 0]) 
+                    .domain(filteredData.map(function(d) {return d.USCity;}))
+                    .padding(0.1); 
+
+          var gPoints2 = svg2.append("g")
+                            .attr("transform", "translate(50, 50)"); 
+
+          gPoints2.selectAll(".rect")
+              .data(filteredData) 
+              .enter().append("rect")
+              .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
+              .attr("y", function(d) { return y2(d.USCity); })
+              .attr("width", function(d) { return 0; })
+              .on('mouseover', function(d,i) {
+                tooltip.style("opacity", 0.8)
+                      .style("left", (d3.event.pageX) + "px")
+                      .style("top", (d3.event.pageY) + "px")
+                      .html(d.AnnualChange)
+              })
+              .on('mouseout', function() {
+                tooltip.style("opacity", 0)
+              })
+              .transition().duration(3000).delay(1000)
+              .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
+              .attr("height", y2.bandwidth())
+              .attr("r", function(d) { return 10; })
+              .attr("fill", function(d) {if(d.AnnualChange < 0) return "#A51505"; return "#028017";});
+              **/
     }
 
 
@@ -324,7 +390,8 @@
       const regions = {
         'Western States': [...pacificStates, ...mountainStates],
         'Midwestern States': [...eastNorthCentral, ...westNorthCentral],
-        'Eastern States': [...northeast, ...south]
+        'Eastern States': [...northeast, ...southAtlantic],
+        'Southern States': [...southAtlantic, ...eastSouthCentral, ...westSouthCentral]
       };
       let color = '#CFD5A0';
       
@@ -340,6 +407,10 @@
         color = '#CB1522';
         return color;
       }
+      if(regions['Southern States'].includes(cityState)) {
+        color = '#FFF347';
+        return color;
+      }
 
       return color;
     }
@@ -353,13 +424,20 @@
             'Midwestern States': [...eastNorthCentral, ...westNorthCentral],
             'East North Central': eastNorthCentral,
             'West North Central': westNorthCentral,
-            'Eastern States': [...northeast, ...south],
+            'Eastern States': [...northeast, ...southAtlantic],
             'Northeast': northeast,
-            'South': south
+            'South Atlantic': southAtlantic,
+            'Southern States': [...southAtlantic, ...eastSouthCentral, ...westSouthCentral],
+            'East South Central': eastSouthCentral,
+            'West South Central': westSouthCentral
         };
 
         const filteredData = filterByRegion(regions[regionName]);
         updateVisualization(filteredData);
+    }
+
+    function clearData() {
+      updateVisualization(original_data);
     }
 </script>
 </body>
