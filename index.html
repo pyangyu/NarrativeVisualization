@@ -15,6 +15,11 @@
           <h1 class="title">Population Of All popular US Cities</h1>
           <h2 class="subtitle">Explore demographic trends across different cities</h2>
       </div>
+
+      <div class="svg-popup-container">
+        <svg class="clickShowText" width="0" height="0"></svg>
+      </div>
+    
       <div class="clear_button">
         <button onclick="clearData()">Clear</button>
       </div>
@@ -492,6 +497,7 @@
     //                                                                                                          //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function clearData() {
+      clickButton("");
       updateVisualization(original_data, "whole");
       regions_specific= wholeUS;
       updateVisualization2(original_data, regions_specific);
@@ -512,6 +518,8 @@
         'East South Central': eastSouthCentral,
         'West South Central': westSouthCentral
       };
+
+      clickButton(regions[regionName]);
      
       const filteredData = filterByRegion(regions[regionName]);
       regions_specific = regions[regionName];
@@ -554,6 +562,42 @@
     function resetData() {
       updateVisualization2(original_data, regions_specific);
     }
+
+    function clickButton(stringArray) {
+      const container = d3.select(".svg-popup-container");
+      const svg = d3.select(".clickShowText");
+  
+      if (stringArray.length === 0) {
+          container.style("display", "none");
+      } else {
+          svg.selectAll("*").remove();
+          var texts = svg.selectAll("text")
+                         .data(stringArray, (d) => d);
+  
+          texts.enter()
+               .append("text")
+               .attr("x", 10)
+               .attr("y", (d, i) => 20 * (i + 1))
+               .text(d => d);
+  
+          texts.attr("x", 10)
+               .attr("y", (d, i) => 20 * (i + 1))
+               .text(d => d);
+  
+          // Exit and remove old texts
+          texts.exit().remove();
+  
+          const numItems = stringArray.length;
+          const newHeight = numItems * 20 + 10;
+          const newWidth = 200;
+  
+          svg.attr("width", newWidth)
+             .attr("height", newHeight);
+  
+          container.style("display", "block");
+      }
+  }  
+  
 </script>
 </body>
 </html>

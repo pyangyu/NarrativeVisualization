@@ -28,6 +28,21 @@ body {
   margin-bottom: 30px; 
 }
 
+/* pop-up */
+.svg-popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  display: none;
+  z-index: 1000;
+}
+
+.clickShowText {
+  display: block;
+  overflow: visible;  
+}
+
 
 /* button */
 .flex-container {
