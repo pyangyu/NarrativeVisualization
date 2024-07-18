@@ -1,5 +1,5 @@
 <!-- https://www.kaggle.com/datasets/dataanalyst001/population-of-all-us-cities-2024 -->
-
+ 
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="src/style.css">
         <script src='https://d3js.org/d3.v5.min.js'></script>
     </head>
-
+ 
     <script src='https://d3js.org/d3.v5.min.js'></script>
     <body onload='init()'>
       <div class="title-container">
@@ -37,7 +37,7 @@
             <button onclick="logRegion('Eastern States')">Eastern States</button>
             <div class="nested-buttons">
                 <button onclick="logRegion('Northeast')">Northeast</button>
-                <button onclick="logRegion('South')">South</button>
+                <button onclick="logRegion('South Atlantic')">South Atlantic</button>
             </div>
         </div>
         <div class="button-container">
@@ -45,6 +45,7 @@
           <div class="nested-buttons">
               <button onclick="logRegion('East South Central')">East South Central</button>
               <button onclick="logRegion('West South Central')">West South Central</button>
+              <button onclick="logRegion('South Atlantic')">South Atlantic</button>
           </div>
       </div>
       </div>
@@ -53,21 +54,41 @@
           <svg class="svg1" viewBox="0 0 960 500"></svg>
           <svg class="svg1_region"></svg>
       </div>
-
+ 
+      <div class="clear_button">
+        <button onclick="resetData()">Reset</button>
+      </div>
+      <div class="flex-container">
+        <div class="button-container">
+          <text>Sort by AnnualChange</text>
+          <div class="nested-buttons">
+              <button onclick="sortingChange('SortByChangeUp','')">Sort by AnnualChange ↑</button>
+              <button onclick="sortingChange('SortByChangeDown','')">Sort by AnnualChange ↓</button>
+          </div>
+        </div>
+        <div class="button-container">
+          <text>Sort Alphabetically</text>
+          <div class="nested-buttons">
+              <button onclick="sortingChange('SortByAlphabeticUp','')">Sort Alphabetically a → z</button>
+              <button onclick="sortingChange('SortByAlphabeticDown','')">Sort Alphabetically z → a</button>
+          </div>
+        </div>
+      </div>
+     
       <div class="svg-container2">
           <!-- SVG inside a div that controls the size -->
           <svg class="svg2" viewBox="0 0 960 4500"></svg>
           <svg class="svg2_region"></svg>
       </div>
-
-
+ 
+ 
       <!-- tooltip -->
        <div id="tooltip" class="tooltip"></div>
        <div id="tooltip2" class="tooltip2"></div>
-       
+      
 <script>
-
-
+ 
+ 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                                          //
     //                                              Define state groups                                         //
@@ -76,37 +97,37 @@
     const pacificStates = ["California", "Oregon", "Washington", "Alaska", "Hawaii"];
     const mountainStates = ["Arizona", "Nevada", "New Mexico", "Utah", "Colorado", "Idaho", "Montana", "Wyoming"];
     const westernStates = [...pacificStates, ...mountainStates];
-
+ 
     const eastNorthCentral = ["Ohio", "Indiana", "Michigan", "Illinois", "Wisconsin"];
     const westNorthCentral = ["Missouri", "North Dakota", "South Dakota", "Nebraska", "Kansas", "Minnesota", "Iowa"];
     const midwesternStates = [...eastNorthCentral, ...westNorthCentral];
-
+ 
     const southAtlantic = ["Delaware", "Maryland", "Virginia", "West Virginia", "North Carolina", "South Carolina", "Georgia", "Florida", "District of Columbia"];
     const eastSouthCentral = ["Kentucky", "Tennessee", "Alabama", "Mississippi"];
     const westSouthCentral = ["Arkansas", "Louisiana", "Oklahoma", "Texas"];
     const southernStates = [...southAtlantic, ...eastSouthCentral, ...westSouthCentral];
-
+ 
     const northeast = ["Maine", "New Hampshire", "Vermont", "Massachusetts", "Rhode Island", "Connecticut", "New York", "New Jersey", "Pennsylvania"];
-    const easternStates = [...northeast, ...southAtlantic]; 
-
+    const easternStates = [...northeast, ...southAtlantic];
+ 
     const usTerritories = ["Puerto Rico", "Guam", "U.S. Virgin Islands", "Northern Mariana Islands", "American Samoa"];
-
-
+ 
+ 
     let original_data = [];
-
+ 
     async function init() {
       original_data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
       let data = original_data;
-
-
+ 
+ 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //                                                                                                          //
       //                                              Define svg1 graph                                           //
       //                                                                                                          //
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // region
-
-      var svg_r = d3.select("svg.svg1_region"); 
+ 
+      var svg_r = d3.select("svg.svg1_region");
       var data_region = [
           { region: "Western States", color: "#2222D2" },
           { region: "Pacific States", color: "#FF8C00" },
@@ -114,56 +135,57 @@
           { region: "Midwestern States", color: "#1EB50D" },
           { region: "East North Central", color: "#F08080" },
           { region: "West North Central", color: "#90EE90" },
+          { region: "Eastern States", color: "#CB1522" },
+          { region: "Northeast", color: "#86F4FF" },
+          { region: "South Atlantic", color: "#20B2AA" },
           { region: "Southern States", color: "#FFF347" },
           { region: "East South Central", color: "#B496FF" },
           { region: "West South Central", color: "#23E9A7" },
-          { region: "Eastern States", color: "#CB1522" },
-          { region: "Northeast", color: "#E0FFFF" },
           { region: "South Atlantic", color: "#20B2AA" },
       ];
-
+ 
       // Create Legend
       var legend = svg_r.append("g")
                       .attr("class", "legend")
-                      .attr("transform", "translate(50, 50)"); 
-
+                      .attr("transform", "translate(50, 50)");
+ 
       legend.selectAll("rect")
             .data(data_region)
             .enter().append("rect")
-            .attr("x", function(d,i) {if(i % 3 == 2 || i % 3 == 1) return 25; return 0;})
-            .attr("y", function(d, i) { return i * 24; }) 
+            .attr("x", function(d,i) {if(i == 12 || i % 3 == 2 || i % 3 == 1) return 25; return 0;})
+            .attr("y", function(d, i) { return i * 24; })
             .attr("width", 18)
             .attr("height", 18)
             .style("fill", function(d) { return d.color; });
-
+ 
       legend.selectAll("text")
             .data(data_region)
             .enter().append("text")
-            .attr("x", function(d,i) {if(i % 3 == 2 || i % 3 == 1) return 50; return 25;})
+            .attr("x", function(d,i) {if(i == 12 || i % 3 == 2 || i % 3 == 1) return 50; return 25;})
             .attr("y", function(d, i) { return i * 24 + 14; })
             .text(function(d) { return d.region; });
-
+ 
       legend.append("text")
             .attr("x", 0)
             .attr("y", -10)
             .attr("font-weight", "bold")
-            .text("Region");        
-
-
-      var svg = d3.select("svg.svg1"); 
-
+            .text("Region");       
+ 
+ 
+      var svg = d3.select("svg.svg1");
+ 
       var x = d3.scaleLog()
-                .range([0, 860]) 
-                .domain([6, 1500]); 
-
+                .range([0, 860])
+                .domain([6, 1500]);
+ 
       var y = d3.scaleLog()
-                .range([400, 0]) 
-                .domain([90000, 7000000]); 
+                .range([400, 0])
+                .domain([90000, 7000000]);
       var gPoints = svg.append("g")
-                       .attr("transform", "translate(50, 50)"); 
-
+                       .attr("transform", "translate(50, 50)");
+ 
       var tooltip = d3.select("#tooltip");
-
+ 
       gPoints.selectAll(".circle")
         .data(data)
         .enter().append("circle")
@@ -184,208 +206,239 @@
         })
         .transition().duration(3000).delay(1000)
         .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
-
+ 
         var gYAxes = svg.append("g")
                        .attr("transform", "translate(" + 50 + "," + 50 + ")")
                        .call(d3.axisLeft(y)
                           .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
-
+ 
         var gXAxes = svg.append("g")
                        .attr("transform", "translate(" + 50 + "," + 450 + ")")
                        .call(d3.axisBottom(x)
-                          .tickFormat(d3.format(".0s"))); 
-
-
-
-
-
+                          .tickFormat(d3.format(".0s")));
+ 
+ 
+ 
+ 
+ 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //                                                                                                          //
       //                                              Define svg2 graph                                           //
       //                                                                                                          //
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+ 
       // region
-      var svg_r2 = d3.select("svg.svg2_region"); 
+      var svg_r2 = d3.select("svg.svg2_region");
       var data_region2 = [
           { region: "Increase", color: "#028017" },
           { region: "Decrease", color: "#A51505" }
       ];
-
+ 
       // Create Legend
       var legend2 = svg_r2.append("g")
                       .attr("class", "legend")
-                      .attr("transform", "translate(50, 50)"); 
-
+                      .attr("transform", "translate(50, 50)");
+ 
       legend2.selectAll("rect")
             .data(data_region2)
             .enter().append("rect")
             .attr("x", 0)
-            .attr("y", function(d, i) { return i * 24; }) 
+            .attr("y", function(d, i) { return i * 24; })
             .attr("width", 18)
             .attr("height", 18)
             .style("fill", function(d) { return d.color; });
-
+ 
       legend2.selectAll("text")
             .data(data_region2)
             .enter().append("text")
             .attr("x", 25)
             .attr("y", function(d, i) { return i * 24 + 14; })
             .text(function(d) { return d.region; });
-
+ 
       legend2.append("text")
             .attr("x", 0)
             .attr("y", -10)
             .attr("font-weight", "bold")
-            .text("Region");      
-
-                        
+            .text("Region");  
+ 
+                       
       var svg2 = d3.select("svg.svg2");
-
+ 
       var x2_positive = d3.scaleLinear()
-                .range([0, 430]) 
+                .range([0, 430])
                 .domain([0, 0.06]);
-
+ 
       var x2 = d3.scaleLinear()
-                .range([0, 860]) 
-                .domain([-0.06, 0.06]); 
-
+                .range([0, 860])
+                .domain([-0.06, 0.06]);
+ 
       var y2 = d3.scaleBand()
-                .range([4400, 0]) 
-                .domain(data.map(function(d) {return d.USCity;}))
-                .padding(0.1); 
-
+                .range([4400, 0])
+                .domain(data.map(function(d) {return d.USCity + ", " + d.USState;}))
+                .padding(0.1);
+ 
       var gPoints2 = svg2.append("g")
-                        .attr("transform", "translate(50, 50)"); 
-
+                        .attr("transform", "translate(50, 50)");
+ 
+      var tooltip2 = d3.select("#tooltip2");
+ 
       gPoints2.selectAll(".rect")
-          .data(data) 
+          .data(data)
           .enter().append("rect")
           .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
-          .attr("y", function(d) { return y2(d.USCity); })
+          .attr("y", function(d) { return y2(d.USCity + ", " + d.USState); })
           .attr("width", function(d) { return 0; })
           .on('mouseover', function(d,i) {
-            tooltip.style("opacity", 0.8)
+            tooltip2.style("opacity", 0.8)
                    .style("left", (d3.event.pageX) + "px")
                    .style("top", (d3.event.pageY) + "px")
                    .html(d.AnnualChange)
           })
           .on('mouseout', function() {
-            tooltip.style("opacity", 0)
+            tooltip2.style("opacity", 0)
           })
           .transition().duration(3000).delay(1000)
           .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
           .attr("height", y2.bandwidth())
           .attr("r", function(d) { return 10; })
           .attr("fill", function(d) {if(d.AnnualChange < 0) return "#A51505"; return "#028017";});
-      
+     
       var gYAxes2 = svg2.append("g")
-                      .attr("transform", "translate(480, 50)") 
-                      .call(d3.axisLeft(y2).tickPadding(10) 
+                      .attr("class", "gY2")
+                      .attr("transform", "translate(480, 50)")
+                      .call(d3.axisLeft(y2).tickPadding(10)
                                         .tickSize(0));
-
-
+ 
+      gYAxes2.selectAll(".tick text")
+          .attr("class", "gY2-text")
+          .attr("x", -450)
+          .style("text-anchor", "start");
+ 
       var gXAxes2 = svg2.append("g")
-          .attr("transform", "translate(50, 42)") 
+          .attr("transform", "translate(50, 42)")
           .call(d3.axisBottom(x2)
-              .tickFormat(d3.format(".0s")) 
-              .tickSizeInner(8) 
-              .tickSizeOuter(0)); 
-
+              .tickFormat(d3.format(".0s"))
+              .tickSizeInner(8)
+              .tickSizeOuter(0));
+ 
       gXAxes2.selectAll(".tick text")
-          .attr("y", -10) 
-          .style("text-anchor", "middle"); 
-
+          .attr("y", -10)
+          .style("text-anchor", "middle");
+ 
     }
-
+ 
     function filterByRegion(regionStates) {
       return original_data.filter(d => regionStates.includes(d.USState));
     }
-
-    async function updateVisualization(filteredData) {
-        // svg1
-
+ 
+    async function updateVisualization(filteredData, nestRegion) {
         var svg1 = d3.select("svg.svg1");
-
+ 
         svg1.selectAll("circle").remove();
-
+ 
         var x = d3.scaleLog()
-                .range([0, 860]) 
-                .domain([6, 1500]); 
-
+                .range([0, 860])
+                .domain([6, 1500]);
+ 
         var y = d3.scaleLog()
-                  .range([400, 0]) 
-                  .domain([90000, 7000000]); 
+                  .range([400, 0])
+                  .domain([90000, 7000000]);
                   
         var gPoints = svg1.append("g")
-                        .attr("transform", "translate(50, 50)"); 
-
+                        .attr("transform", "translate(50, 50)");
+ 
         var tooltip = d3.select("#tooltip");
-
+ 
         gPoints.selectAll(".circle")
           .data(filteredData)
           .enter().append("circle")
           .attr("cx", function(d) { return x(d.Area); })
           .attr("cy", function(d) { return y(d.Population2024); })
-          .attr("r", function(d) { return 0; })
-          .attr("fill", function(d) {return checkCity(d.USState);})
+          .attr("r", function(d) { return 2; })
+          .attr("fill", function(d) {
+            if(nestRegion == "Pacific States") return "#FF8C00";
+            if(nestRegion == "Mountain States") return "#ADFF2F";
+            if(nestRegion == "East North Central") return "#F08080";
+            if(nestRegion == "West North Central") return "#90EE90";
+            if(nestRegion == "Northeast") return "#86F4FF";
+            if(nestRegion == "South Atlantic") return "#20B2AA";
+            if(nestRegion == "East South Central") return "#B496FF";
+            if(nestRegion == "West South Central") return "#23E9A7";
+            return checkCity(d.USState);
+          })
           .on('mouseover', function(d,i) {
             tooltip.style("opacity", 0.8)
-                  .style("left", (d3.event.pageX) + "px")
-                  .style("top", (d3.event.pageY) + "px")
-                  .html(d.USCity + '\n' + d.USState + '\n' + d.Density)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY) + "px")
+            .html(d.USCity + '\n' + d.USState + '\n' + d.Density)
           })
           .on('mouseout', function() {
             tooltip.style("opacity", 0)
           })
           .transition().duration(3000).delay(1000)
-          .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
-
-
-          // svg2
-          /**
+          .attr("r", function(d) { if(nestRegion == "whole") return Math.pow(d.Density, 1/4.2); return Math.pow(d.Density, 1/3.7); });
+        }
+       
+        
+        function updateVisualization2(filteredData, nestRegion) {
           var svg2 = d3.select("svg.svg2");
-
+         
+          svg2.selectAll("rect").remove();
+          svg2.selectAll(".gY2").remove();
+          svg2.selectAll(".gY2-text").remove();
+         
+          var tooltip2 = d3.select("#tooltip2");
+         
           var x2_positive = d3.scaleLinear()
-                    .range([0, 430]) 
-                    .domain([0, 0.06]);
-
+          .range([0, 430])
+          .domain([0, 0.06]);
+         
           var x2 = d3.scaleLinear()
-                    .range([0, 860]) 
-                    .domain([-0.06, 0.06]); 
-
+          .range([0, 860])
+          .domain([-0.06, 0.06]);
+          
           var y2 = d3.scaleBand()
-                    .range([4400, 0]) 
-                    .domain(filteredData.map(function(d) {return d.USCity;}))
-                    .padding(0.1); 
-
-          var gPoints2 = svg2.append("g")
-                            .attr("transform", "translate(50, 50)"); 
-
-          gPoints2.selectAll(".rect")
-              .data(filteredData) 
-              .enter().append("rect")
-              .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
-              .attr("y", function(d) { return y2(d.USCity); })
-              .attr("width", function(d) { return 0; })
-              .on('mouseover', function(d,i) {
-                tooltip.style("opacity", 0.8)
-                      .style("left", (d3.event.pageX) + "px")
-                      .style("top", (d3.event.pageY) + "px")
-                      .html(d.AnnualChange)
-              })
-              .on('mouseout', function() {
-                tooltip.style("opacity", 0)
-              })
-              .transition().duration(3000).delay(1000)
-              .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
-              .attr("height", y2.bandwidth())
-              .attr("r", function(d) { return 10; })
-              .attr("fill", function(d) {if(d.AnnualChange < 0) return "#A51505"; return "#028017";});
-              **/
+          .range([4400, 0])
+          .domain(filteredData.map(function(d) {return d.USCity + ", " + d.USState;}))
+                .padding(0.1);
+                
+                var gPoints2 = svg2.append("g")
+                .attr("transform", "translate(50, 50)");
+               
+                gPoints2.selectAll(".rect")
+                .data(filteredData)
+                .enter().append("rect")
+                .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
+                .attr("y", function(d) { return y2(d.USCity + ", " + d.USState); })
+                .attr("width", function(d) { return 0; })
+                .on('mouseover', function(d,i) {
+                  tooltip2.style("opacity", 0.8)
+                  .style("left", (d3.event.pageX) + "px")
+                  .style("top", (d3.event.pageY) + "px")
+                  .html(d.AnnualChange)
+                })
+                .on('mouseout', function() {
+                  tooltip2.style("opacity", 0)
+                })
+                .transition().duration(3000).delay(1000)
+                .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
+                .attr("height", y2.bandwidth())
+                .attr("r", function(d) { return 10; })
+                .attr("fill", function(d) {if(!nestRegion.includes(d.USState)) return "#EAEEEC"; if(d.AnnualChange < 0) return "#A51505"; return "#028017";});
+               
+                var gYAxes2 = svg2.append("g")
+                .attr("class", "gY2")
+                .attr("transform", "translate(480, 50)")
+                .call(d3.axisLeft(y2).tickPadding(10)
+                .tickSize(0));
+               
+                gYAxes2.selectAll(".tick text")
+                .attr("class", "gY2-text")
+                .attr("x", -450)
+                .style("text-anchor", "start");
     }
-
-
+   
+    
     function checkCity(cityState) {
       const regions = {
         'Western States': [...pacificStates, ...mountainStates],
@@ -394,7 +447,7 @@
         'Southern States': [...southAtlantic, ...eastSouthCentral, ...westSouthCentral]
       };
       let color = '#CFD5A0';
-      
+     
       if(regions['Western States'].includes(cityState)) {
         color = '#2222D2';
         return color;
@@ -411,33 +464,74 @@
         color = '#FFF347';
         return color;
       }
-
+     
       return color;
     }
-  
-
-    function logRegion(regionName) {
-        const regions = {
-            'Western States': [...pacificStates, ...mountainStates],
-            'Pacific States': pacificStates,
-            'Mountain States': mountainStates,
-            'Midwestern States': [...eastNorthCentral, ...westNorthCentral],
-            'East North Central': eastNorthCentral,
-            'West North Central': westNorthCentral,
-            'Eastern States': [...northeast, ...southAtlantic],
-            'Northeast': northeast,
-            'South Atlantic': southAtlantic,
-            'Southern States': [...southAtlantic, ...eastSouthCentral, ...westSouthCentral],
-            'East South Central': eastSouthCentral,
-            'West South Central': westSouthCentral
-        };
-
-        const filteredData = filterByRegion(regions[regionName]);
-        updateVisualization(filteredData);
-    }
-
+   
     function clearData() {
-      updateVisualization(original_data);
+      updateVisualization(original_data, "whole");
+      regions_specific= [...westernStates, ...midwesternStates, ...southernStates, ...easternStates];
+      updateVisualization2(original_data, regions_specific);
+    }
+   
+    let regions_specific= [...westernStates, ...midwesternStates, ...southernStates, ...easternStates];
+   
+    function logRegion(regionName) {
+      const regions = {
+        'Western States': [...pacificStates, ...mountainStates],
+        'Pacific States': pacificStates,
+        'Mountain States': mountainStates,
+        'Midwestern States': [...eastNorthCentral, ...westNorthCentral],
+        'East North Central': eastNorthCentral,
+        'West North Central': westNorthCentral,
+        'Eastern States': [...northeast, ...southAtlantic],
+        'Northeast': northeast,
+        'South Atlantic': southAtlantic,
+        'Southern States': [...southAtlantic, ...eastSouthCentral, ...westSouthCentral],
+        'East South Central': eastSouthCentral,
+        'West South Central': westSouthCentral
+      };
+     
+      const filteredData = filterByRegion(regions[regionName]);
+      regions_specific = regions[regionName];
+      updateVisualization(filteredData, regionName);
+      updateVisualization2(original_data, regions_specific);
+    }
+   
+    function sortingChange(sortingMethod, regionName) {
+      let data = JSON.parse(JSON.stringify(original_data))
+     
+      if(sortingMethod == "SortByChangeUp") {
+        data.forEach(function(d) {
+          d.AnnualChange = parseFloat(d.AnnualChange);
+        });
+        data.sort(function(a,b) {
+          return d3.descending(a.AnnualChange, b.AnnualChange);
+        });
+      }
+      if(sortingMethod == "SortByChangeDown") {
+        data.forEach(function(d) {
+          d.AnnualChange = parseFloat(d.AnnualChange);
+        });
+        data.sort(function(a,b) {
+          return d3.ascending(a.AnnualChange, b.AnnualChange);
+        });
+      }
+      if(sortingMethod == "SortByAlphabeticUp") {
+        data.sort(function(a,b) {
+          return d3.descending(a.USCity, b.USCity);
+        });
+      }
+      if(sortingMethod == "SortByAlphabeticDown") {
+        data.sort(function(a,b) {
+          return d3.ascending(a.USCity, b.USCity);
+        });
+      }
+      updateVisualization2(data, regions_specific);
+    }
+ 
+    function resetData() {
+      updateVisualization2(original_data, regions_specific);
     }
 </script>
 </body>
