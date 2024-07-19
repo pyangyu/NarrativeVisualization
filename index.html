@@ -209,6 +209,7 @@
         .attr("cy", function(d) { return y(d.Population2024); })
         .attr("r", function(d) { return 2; })
         .attr("fill", function(d) {return checkCity(d.USState);})
+        .on("click", d => circleClick(d))
         .on('mouseover', function(d,i) {
           tooltip.style("opacity", 0.8)
                  .style("left", (d3.event.pageX) + "px")
@@ -302,6 +303,7 @@
           .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
           .attr("y", function(d) { return y2(d.USCity + ", " + d.USState); })
           .attr("width", function(d) { return 0; })
+          .on("click", d => rectClick(d))
           .on('mouseover', function(d,i) {
             tooltip2.style("opacity", 0.8)
                    .style("left", (d3.event.pageX) + "px")
@@ -382,6 +384,7 @@
             if(nestRegion == "West South Central") return "#23E9A7";
             return checkCity(d.USState);
           })
+          .on("click", d => circleClick(d))
           .on('mouseover', function(d,i) {
             tooltip.style("opacity", 0.8)
             .style("left", (d3.event.pageX) + "px")
@@ -426,6 +429,7 @@
             .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
             .attr("y", function(d) { return y2(d.USCity + ", " + d.USState); })
             .attr("width", function(d) { return 0; })
+            .on("click", d => rectClick(d))
             .on('mouseover', function(d,i) {
               tooltip2.style("opacity", 0.8)
               .style("left", (d3.event.pageX) + "px")
@@ -615,6 +619,16 @@
           container.style("display", "block");
       }
   }  
+
+  function circleClick(d) {
+    alert("here");
+    // alert(d.USCity + " " + d.USState + " " + d.Population2024 + " " + d.Population2020 + " " + d.AnnualChange + " " + d.Density);
+  }
+
+  function rectClick(d) {
+    alert("here");
+    // alert(d.USCity + " " + d.USState + " " + d.Population2024 + " " + d.Population2020 + " " + d.AnnualChange + " " + d.Density);
+  }
   
 </script>
 </body>
