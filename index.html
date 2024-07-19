@@ -570,25 +570,40 @@
       if (stringArray.length === 0) {
           container.style("display", "none");
       } else {
+          container.selectAll("button").remove();
           svg.selectAll("*").remove();
+
+          var myButton = container.append("button")
+                                  .style("color", "red")
+                                  .style("position", "absolute")
+                                  .style("left", "210px")
+                                  .style("top", "2px")
+                                  .text("X")
+                                  .on("click", function() {
+                                    svg.selectAll("*").remove();
+                                    container.style("display", "none");
+                                  });
+
           var texts = svg.selectAll("text")
                          .data(stringArray, (d) => d);
   
           texts.enter()
+                .append("text")
+                .attr("x", 5)
+                .attr("y", 20)
+                .text("The selected groups includes\n");
+                        
+          texts.enter()
                .append("text")
                .attr("x", 10)
-               .attr("y", (d, i) => 20 * (i + 1))
-               .text(d => d);
-  
-          texts.attr("x", 10)
-               .attr("y", (d, i) => 20 * (i + 1))
+               .attr("y", (d, i) => 20 + 20 * (i + 1))
                .text(d => d);
   
           // Exit and remove old texts
           texts.exit().remove();
   
           const numItems = stringArray.length;
-          const newHeight = numItems * 20 + 10;
+          const newHeight = numItems * 20 + 30;
           const newWidth = 200;
   
           svg.attr("width", newWidth)
