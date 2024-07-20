@@ -29,16 +29,16 @@
         </div>
       </div>
 
-      <div class="scene-one-text" style="display: block;">
-        <p>This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2020. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
+      <div class="scene-one-text" style="display: block; margin: 10px 10%; padding: 5px 2%; border : 1px dotted grey; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);">
+        <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2020. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
       </div>
       
-      <div class="scene-two-text" style="display: none;">
-        <p>This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2024. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
+      <div class="scene-two-text" style="display: none; margin: 10px 10%; padding: 5px 2%; border : 1px dotted grey; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);">
+        <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2024. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
       </div>
       
-      <div class="scene-three-text" style="display: none;">
-        <p>This graph shows how the population in each city increases or decreases. Green represents the increasing and red represents the decreasing.</p>
+      <div class="scene-three-text" style="display: none; margin: 10px 10%; padding: 5px 2%; border : 1px dotted grey; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);">
+        <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">This graph shows how the population in each city increases or decreases. Green represents the increasing and red represents the decreasing.</p>
       </div>
       
     
@@ -318,7 +318,7 @@
                 .domain([90000, 7000000]);
 
       var gPoints0 = svg0.append("g")
-                       .attr("transform", "translate(50, 50)");
+                       .attr("transform", "translate(60, 50)");
  
       var tooltip0 = d3.select("#tooltip0")
                        .style("opacity",0)
@@ -343,29 +343,29 @@
         .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
  
       var gYAxes0 = svg0.append("g")
-                      .attr("transform", "translate(" + 50 + "," + 50 + ")")
+                      .attr("transform", "translate(" + 60 + "," + 50 + ")")
                       .call(d3.axisLeft(y0)
                         .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
 
       var gXAxes0 = svg0.append("g")
-                      .attr("transform", "translate(" + 50 + "," + 450 + ")")
+                      .attr("transform", "translate(" + 60 + "," + 450 + ")")
                       .call(d3.axisBottom(x0)
                         .tickFormat(d3.format(".0s")));
                       
       svg0.append("g").append("text")
       .attr("class", "axis-label")
       .attr("text-anchor", "end")
-      .attr("x", 480)
-      .attr("y", 480)
-      .text("X-axis Label");
+      .attr("x", 520)
+      .attr("y", 490)
+      .text("Area");
 
       svg0.append("g").append("text")
       .attr("class", "axis-label")
       .attr("text-anchor", "end")
       .attr("transform", "rotate(-90)")
-      .attr("x", -250)
-      .attr("y", 50)
-      .text("Y-axis Label");
+      .attr("x", -220)
+      .attr("y", 15)
+      .text("Population");
 
  
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -419,7 +419,7 @@
                 .range([400, 0])
                 .domain([90000, 7000000]);
       var gPoints = svg.append("g")
-                       .attr("transform", "translate(50, 50)");
+                       .attr("transform", "translate(60, 50)");
  
       var tooltip = d3.select("#tooltip")
                        .style("opacity",0)
@@ -444,17 +444,30 @@
         .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
  
         var gYAxes = svg.append("g")
-                       .attr("transform", "translate(" + 50 + "," + 50 + ")")
+                       .attr("transform", "translate(" + 60 + "," + 50 + ")")
                        .call(d3.axisLeft(y)
                           .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
  
         var gXAxes = svg.append("g")
-                       .attr("transform", "translate(" + 50 + "," + 450 + ")")
+                       .attr("transform", "translate(" + 60 + "," + 450 + ")")
                        .call(d3.axisBottom(x)
                           .tickFormat(d3.format(".0s")));
  
  
- 
+        svg.append("g").append("text")
+            .attr("class", "axis-label")
+            .attr("text-anchor", "end")
+            .attr("x", 520)
+            .attr("y", 490)
+            .text("Area");
+      
+        svg.append("g").append("text")
+            .attr("class", "axis-label")
+            .attr("text-anchor", "end")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -220)
+            .attr("y", 15)
+            .text("Population");
  
  
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
