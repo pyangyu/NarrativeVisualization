@@ -19,6 +19,15 @@
       <div class="svg-popup-container">
         <svg class="clickShowText" width="0" height="0"></svg>
       </div>
+      
+      <!-- seperate the three SVGs into three scenes -->
+      <div class="scene-button-container">
+        <div class="scene-buttons">
+          <button onclick="renderSceneOne()">1 (default)</button>
+          <button onclick="renderSceneTwo()">2</button>
+          <button onclick="renderSceneThree()">3</button>
+        </div>
+      </div>
     
       <div class="clear_button">
         <button onclick="clearData()">Clear</button>
@@ -52,18 +61,25 @@
               <button onclick="logRegion('West South Central')">West South Central</button>
               <button onclick="logRegion('South Atlantic')">South Atlantic</button>
           </div>
+        </div>
       </div>
+
+      <div class="svg-container0">
+        <!-- SVG inside a div that controls the size -->
+        <svg class="svg0" viewBox="0 0 960 500"></svg>
+        <svg class="svg0_region"></svg>
       </div>
+
       <div class="svg-container">
           <!-- SVG inside a div that controls the size -->
           <svg class="svg1" viewBox="0 0 960 500"></svg>
           <svg class="svg1_region"></svg>
       </div>
  
-      <div class="clear_button">
+      <div class="reset_button">
         <button onclick="resetData()">Reset</button>
       </div>
-      <div class="flex-container">
+      <div id="sortButton" class="flex-container">
         <div class="button-container">
           <p>Sort by AnnualChange</p>
           <div class="nested-buttons">
@@ -88,6 +104,7 @@
  
  
       <!-- tooltip -->
+       <div id="tooltip0" class="tooltip0"></div>
        <div id="tooltip" class="tooltip"></div>
        <div id="tooltip2" class="tooltip2"></div>
 
@@ -130,20 +147,94 @@
     let original_data = [];
 
     let regions_specific= wholeUS;
- 
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                          //
+    //                                        Define tooltip function                                           //
+    //                                                                                                          //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function showTooltip(d, tooltipHere) {
+      tooltipHere
+        .transition()
+        .duration(200)
+      tooltipHere.style("opacity", 0.8)
+          .html(d.USCity + "\n" + d.USState + "\n" + d.Density)
+          .style("left", (d3.event.pageX + 10) + "px")
+          .style("top", (d3.event.pageY + 10) + "px")
+    }
+
+    function moveTooltip(d, tooltipHere) {
+      tooltipHere
+          .style("left", (d3.event.pageX + 10) + "px")
+          .style("top", (d3.event.pageY + 10) + "px")
+    }
+
+    function hideTooltip(d, tooltipHere) {
+      tooltipHere
+          .transition()
+          .duration(200)
+          .style("opacity", 0)
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                          //
+    //                                         Add highlight function                                           //
+    //                                                                                                          //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function highlight(d, svgNumber) {
+      d3.selectAll(".bubbles").style("opacity", 0.05)
+      switch(d.region) {
+        case "Western States":
+          for(x in westernStates) { d3.selectAll("."+westernStates[x]).style("opacity",1) }
+        break;
+        case "Pacific States":
+          for(x in pacificStates) { d3.selectAll("."+pacificStates[x]).style("opacity",1) }
+        break;
+        case "Mountain States":
+          for(x in mountainStates) { d3.selectAll("."+mountainStates[x]).style("opacity",1) }
+        break;
+        case "Midwestern States":
+          for(x in midwesternStates) { d3.selectAll("."+midwesternStates[x]).style("opacity",1) }
+        break;
+        case "East North Central":
+          for(x in eastNorthCentral) { d3.selectAll("."+eastNorthCentral[x]).style("opacity",1) }
+        break;
+        case "West North Central":
+          for(x in westNorthCentral) { d3.selectAll("."+westNorthCentral[x]).style("opacity",1) }
+        break;
+        case "Eastern States":
+          for(x in easternStates) { d3.selectAll("."+easternStates[x]).style("opacity",1) }
+        break;
+        case "Northeast":
+          for(x in northeast) { d3.selectAll("."+northeast[x]).style("opacity",1) }
+        break;
+        case "South Atlantic":
+          for(x in southAtlantic) { d3.selectAll("."+southAtlantic[x]).style("opacity",1) }
+        break;
+        case "Southern States":
+          for(x in southernStates) { d3.selectAll("."+southernStates[x]).style("opacity",1) }
+        break;
+        case "East South Central":
+          for(x in eastSouthCentral) { d3.selectAll("."+eastSouthCentral[x]).style("opacity",1) }
+        break;
+        case "West South Central":
+          for(x in westSouthCentral) { d3.selectAll("."+westSouthCentral[x]).style("opacity",1) }
+        break;
+        default: break;
+      }
+    }
+
+    function noHighlight(d, svgNumber) {
+      d3.selectAll(".bubbles").style("opacity", 1);
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
     async function init() {
       original_data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
       let data = original_data;
  
- 
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //                                                                                                          //
-      //                                              Define svg1 graph                                           //
-      //                                                                                                          //
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // region
- 
-      var svg_r = d3.select("svg.svg1_region");
       var data_region = [
           { region: "Western States", color: "#2222D2" },
           { region: "Pacific States", color: "#FF8C00" },
@@ -159,6 +250,103 @@
           { region: "West South Central", color: "#23E9A7" },
           { region: "South Atlantic", color: "#20B2AA" },
       ];
+
+      renderSceneOne();
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //                                                                                                          //
+      //                                              Define svg0 graph                                           //
+      //                                                                                                          //
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // region
+
+      var svg_r0 = d3.select("svg.svg0_region");
+
+      // Create Legend
+      var legend0 = svg_r0.append("g")
+                      .attr("class", "legend")
+                      .attr("transform", "translate(50, 50)");
+ 
+      legend0.selectAll("rect")
+            .data(data_region)
+            .enter().append("rect")
+            .attr("x", function(d,i) {if(i == 12 || i % 3 == 2 || i % 3 == 1) return 25; return 0;})
+            .attr("y", function(d, i) { return i * 24; })
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", function(d) { return d.color; })
+            .on("mouseover", d => highlight(d, "zero"))
+            .on("mouseout", d => noHighlight(d, "zero"));
+ 
+      legend0.selectAll("text")
+            .data(data_region)
+            .enter().append("text")
+            .attr("x", function(d,i) {if(i == 12 || i % 3 == 2 || i % 3 == 1) return 50; return 25;})
+            .attr("y", function(d, i) { return i * 24 + 14; })
+            .text(function(d) { return d.region; })
+            .on("mouseover", d => highlight(d, "zero"))
+            .on("mouseout", d => noHighlight(d, "zero"));
+ 
+      legend0.append("text")
+            .attr("x", 0)
+            .attr("y", -10)
+            .attr("font-weight", "bold")
+            .text("Region");       
+ 
+ 
+      var svg0 = d3.select("svg.svg0");
+ 
+      var x0 = d3.scaleLog()
+                .range([0, 860])
+                .domain([6, 1500]);
+ 
+      var y0 = d3.scaleLog()
+                .range([400, 0])
+                .domain([90000, 7000000]);
+
+      var gPoints0 = svg0.append("g")
+                       .attr("transform", "translate(50, 50)");
+ 
+      var tooltip0 = d3.select("#tooltip0")
+                       .style("opacity",0)
+                       .style("background-color", "black")
+                       .style("border-radius", "5px")
+                       .style("padding", "10px")
+                       .style("color", "white");
+ 
+      gPoints0.selectAll(".circle")
+        .data(data)
+        .enter().append("circle")
+        .attr("class", function(d) { return "bubbles " + d.USState; })
+        .attr("cx", function(d) { return x0(d.Area); })
+        .attr("cy", function(d) { return y0(d.Population2020); })
+        .attr("r", function(d) { return 2; })
+        .attr("fill", function(d) {return checkCity(d.USState);})
+        .on("click", d => circleClick(d))
+        .on('mouseover', d => showTooltip(d, tooltip0))
+        .on('mousemove', d => moveTooltip(d, tooltip0))
+        .on('mouseout', d => hideTooltip(d, tooltip0))
+        .transition().duration(3000).delay(1000)
+        .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
+ 
+      var gYAxes0 = svg0.append("g")
+                      .attr("transform", "translate(" + 50 + "," + 50 + ")")
+                      .call(d3.axisLeft(y0)
+                        .tickFormat(d3.format(".0s"))); // Format ticks with SI prefix, no decimal
+
+      var gXAxes0 = svg0.append("g")
+                      .attr("transform", "translate(" + 50 + "," + 450 + ")")
+                      .call(d3.axisBottom(x0)
+                        .tickFormat(d3.format(".0s")));
+ 
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //                                                                                                          //
+      //                                              Define svg1 graph                                           //
+      //                                                                                                          //
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // region
+ 
+      var svg_r = d3.select("svg.svg1_region");
  
       // Create Legend
       var legend = svg_r.append("g")
@@ -172,14 +360,18 @@
             .attr("y", function(d, i) { return i * 24; })
             .attr("width", 18)
             .attr("height", 18)
-            .style("fill", function(d) { return d.color; });
+            .style("fill", function(d) { return d.color; })
+            .on("mouseover", d => highlight(d, "one"))
+            .on("mouseout", d => noHighlight(d, "one"));
  
       legend.selectAll("text")
             .data(data_region)
             .enter().append("text")
             .attr("x", function(d,i) {if(i == 12 || i % 3 == 2 || i % 3 == 1) return 50; return 25;})
             .attr("y", function(d, i) { return i * 24 + 14; })
-            .text(function(d) { return d.region; });
+            .text(function(d) { return d.region; })
+            .on("mouseover", d => highlight(d, "one"))
+            .on("mouseout", d => noHighlight(d, "one"))
  
       legend.append("text")
             .attr("x", 0)
@@ -200,25 +392,25 @@
       var gPoints = svg.append("g")
                        .attr("transform", "translate(50, 50)");
  
-      var tooltip = d3.select("#tooltip");
+      var tooltip = d3.select("#tooltip")
+                       .style("opacity",0)
+                       .style("background-color", "black")
+                       .style("border-radius", "5px")
+                       .style("padding", "10px")
+                       .style("color", "white");;
  
       gPoints.selectAll(".circle")
         .data(data)
         .enter().append("circle")
+        .attr("class", function(d) { return "bubbles " + d.USState; })
         .attr("cx", function(d) { return x(d.Area); })
         .attr("cy", function(d) { return y(d.Population2024); })
         .attr("r", function(d) { return 2; })
         .attr("fill", function(d) {return checkCity(d.USState);})
         .on("click", d => circleClick(d))
-        .on('mouseover', function(d,i) {
-          tooltip.style("opacity", 0.8)
-                 .style("left", (d3.event.pageX) + "px")
-                 .style("top", (d3.event.pageY) + "px")
-                 .html(d.USCity + '\n' + d.USState + '\n' + d.Density)
-        })
-        .on('mouseout', function() {
-          tooltip.style("opacity", 0)
-        })
+        .on('mouseover', d => showTooltip(d, tooltip))
+        .on('mousemove', d => moveTooltip(d, tooltip))
+        .on('mouseout', d => hideTooltip(d, tooltip))
         .transition().duration(3000).delay(1000)
         .attr("r", function(d) { return Math.pow(d.Density, 1/4.2); });
  
@@ -295,7 +487,12 @@
       var gPoints2 = svg2.append("g")
                         .attr("transform", "translate(50, 50)");
  
-      var tooltip2 = d3.select("#tooltip2");
+      var tooltip2 = d3.select("#tooltip2")
+                        .style("opacity",0)
+                        .style("background-color", "black")
+                        .style("border-radius", "5px")
+                        .style("padding", "10px")
+                        .style("color", "white");
  
       gPoints2.selectAll(".rect")
           .data(data)
@@ -304,15 +501,9 @@
           .attr("y", function(d) { return y2(d.USCity + ", " + d.USState); })
           .attr("width", function(d) { return 0; })
           .on("click", d => rectClick(d))
-          .on('mouseover', function(d,i) {
-            tooltip2.style("opacity", 0.8)
-                   .style("left", (d3.event.pageX) + "px")
-                   .style("top", (d3.event.pageY) + "px")
-                   .html(d.AnnualChange)
-          })
-          .on('mouseout', function() {
-            tooltip2.style("opacity", 0)
-          })
+          .on('mouseover', d => showTooltip(d, tooltip2))
+          .on('mousemove', d => moveTooltip(d, tooltip2))
+          .on('mouseout', d => hideTooltip(d, tooltip2))
           .transition().duration(3000).delay(1000)
           .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
           .attr("height", y2.bandwidth())
@@ -628,6 +819,48 @@
   function rectClick(d) {
     alert("here");
     // alert(d.USCity + " " + d.USState + " " + d.Population2024 + " " + d.Population2020 + " " + d.AnnualChange + " " + d.Density);
+  }
+
+  function renderSceneOne() {
+    const container2 = d3.select(".svg-container2");
+    container2.style("display", "none");
+    const container = d3.select(".svg-container");
+    container.style("display", "none");
+    const container0 = d3.select(".svg-container0");
+    container0.style("display", "flex");
+    
+    const resetButton = d3.select(".reset_button");
+    resetButton.style("display", "none");
+    const sortButtons = d3.select("#sortButton");
+    sortButtons.style("display", "none");
+  }
+
+  function renderSceneTwo() {
+    const container2 = d3.select(".svg-container2");
+    container2.style("display", "none");
+    const container = d3.select(".svg-container");
+    container.style("display", "flex");
+    const container0 = d3.select(".svg-container0");
+    container0.style("display", "none");
+
+    const resetButton = d3.select(".reset_button");
+    resetButton.style("display", "none");
+    const sortButtons = d3.select("#sortButton");
+    sortButtons.style("display", "none");
+  }
+
+  function renderSceneThree() {
+    const container2 = d3.select(".svg-container2");
+    container2.style("display", "flex");
+    const container = d3.select(".svg-container");
+    container.style("display", "none");
+    const container0 = d3.select(".svg-container0");
+    container0.style("display", "none");
+
+    const resetButton = d3.select(".reset_button");
+    resetButton.style("display", "flex");
+    const sortButtons = d3.select("#sortButton");
+    sortButtons.style("display", "flex");
   }
   
 </script>
