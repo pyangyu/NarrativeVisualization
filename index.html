@@ -23,11 +23,24 @@
       <!-- seperate the three SVGs into three scenes -->
       <div class="scene-button-container">
         <div class="scene-buttons">
-          <button onclick="renderSceneOne()">1 (default)</button>
-          <button onclick="renderSceneTwo()">2</button>
-          <button onclick="renderSceneThree()">3</button>
+          <button onclick="renderSceneOne()">Area vs Population 2020 (default)</button>
+          <button onclick="renderSceneTwo()">Area vs Population 2024</button>
+          <button onclick="renderSceneThree()">City Population Trends</button>
         </div>
       </div>
+
+      <div class="scene-one-text" style="display: block;">
+        <p>This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2020. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
+      </div>
+      
+      <div class="scene-two-text" style="display: none;">
+        <p>This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2024. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
+      </div>
+      
+      <div class="scene-three-text" style="display: none;">
+        <p>This graph shows how the population in each city increases or decreases. Green represents the increasing and red represents the decreasing.</p>
+      </div>
+      
     
       <div class="clear_button">
         <button onclick="clearData()">Clear</button>
@@ -338,6 +351,22 @@
                       .attr("transform", "translate(" + 50 + "," + 450 + ")")
                       .call(d3.axisBottom(x0)
                         .tickFormat(d3.format(".0s")));
+                      
+      svg0.append("g").append("text")
+      .attr("class", "axis-label")
+      .attr("text-anchor", "end")
+      .attr("x", 480)
+      .attr("y", 480)
+      .text("X-axis Label");
+
+      svg0.append("g").append("text")
+      .attr("class", "axis-label")
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -250)
+      .attr("y", 50)
+      .text("Y-axis Label");
+
  
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //                                                                                                          //
@@ -833,6 +862,13 @@
     resetButton.style("display", "none");
     const sortButtons = d3.select("#sortButton");
     sortButtons.style("display", "none");
+
+    const text1 = d3.select(".scene-one-text");
+    text1.style("display", "block");
+    const text2 = d3.select(".scene-two-text");
+    text2.style("display", "none");
+    const text3 = d3.select(".scene-three-text");
+    text3.style("display", "none");
   }
 
   function renderSceneTwo() {
@@ -847,6 +883,13 @@
     resetButton.style("display", "none");
     const sortButtons = d3.select("#sortButton");
     sortButtons.style("display", "none");
+
+    const text1 = d3.select(".scene-one-text");
+    text1.style("display", "none");
+    const text2 = d3.select(".scene-two-text");
+    text2.style("display", "block");
+    const text3 = d3.select(".scene-three-text");
+    text3.style("display", "none");
   }
 
   function renderSceneThree() {
@@ -861,6 +904,13 @@
     resetButton.style("display", "flex");
     const sortButtons = d3.select("#sortButton");
     sortButtons.style("display", "flex");
+
+    const text1 = d3.select(".scene-one-text");
+    text1.style("display", "none");
+    const text2 = d3.select(".scene-two-text");
+    text2.style("display", "none");
+    const text3 = d3.select(".scene-three-text");
+    text3.style("display", "block");
   }
   
 </script>
