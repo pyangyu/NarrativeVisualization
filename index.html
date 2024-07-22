@@ -11,13 +11,20 @@
  
     <script src='https://d3js.org/d3.v5.min.js'></script>
     <body onload='init()'>
-      <div class="title-container">
+      <div class="title-container" style="margin-bottom: -50px;">
           <h1 class="title">Population Of All popular US Cities</h1>
           <h2 class="subtitle">Explore demographic trends across different cities</h2>
       </div>
 
       <div class="svg-popup-container">
         <svg class="clickShowText" width="0" height="0"></svg>
+      </div>
+
+      <div class="introduction-text" style="display: block; margin: 20px 2%; padding: 5px 2%; ">
+        <p class="title" style="padding-bottom: 10px; font-weight: 600; font-family: 'Raboto', sans-serif; text-align: left;">
+          This visualization project uses the 'Population of All US Cities 2024' dataset, which gives information about the population of 300 popular U.S. cities in the years 2020 and 2024. On this website, the readers can find three graphs, which are "Area vs Population in 2020" (default showing), "Area vs Population in 2024", and "City Population Trends" (annual change of population in each city between 2020 and 2024). These graphs are overviews of population changes and population information in each city. Hopefully, this website can be useful for selecting work locations or for academic purposes or other usages.
+        </p>
+        <hr style="height : 4px; background-color:rgb(161, 160, 160); margin:5px -10px;">
       </div>
       
       <!-- seperate the three SVGs into three scenes -->
@@ -30,15 +37,21 @@
       </div>
 
       <div class="scene-one-text" style="display: block; margin: 10px 10%; padding: 5px 2%; border : 1px dotted grey; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);">
-        <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2020. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
+        <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">
+          This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2020. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.
+        </p>
+        <p style="color: rgb(141, 141, 141);">Readers can filter the data by different census regions, such as Western, Midwestern, Southern, and Eastern States, as well as more specific regions like the Pacific States, etc. Users can also hover over regions to see different regions (trigger this when hovering/un-hovering the legend of the region).</p>
       </div>
       
       <div class="scene-two-text" style="display: none; margin: 10px 10%; padding: 5px 2%; border : 1px dotted grey; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);">
         <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">This graph represents the relationship between the area and population of popular cities in the U.S. in the year 2024. The x-axis represents the area of each city and the y-axis represents the population. The size of each circle represents the density of the city. The color of the circle represents the region of all the states.</p>
+        <p style="color: rgb(141, 141, 141);">Readers can filter the data by different census regions, such as Western, Midwestern, Southern, and Eastern States, as well as more specific regions like the Pacific States, etc. Users can also hover over regions to see different regions (trigger this when hovering/un-hovering the legend of the region).</p>
       </div>
       
       <div class="scene-three-text" style="display: none; margin: 10px 10%; padding: 5px 2%; border : 1px dotted grey; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);">
-        <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">This graph shows how the population in each city increases or decreases. Green represents the increasing and red represents the decreasing.</p>
+        <p class="title" style="padding-bottom: 10px; font-weight: 500; font-family: 'Raboto', sans-serif;">
+          This graph shows how the population in each city increases or decreases. Green represents the increasing and red represents the decreasing.
+        </p>
       </div>
       
     
