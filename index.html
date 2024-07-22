@@ -523,7 +523,12 @@
             .attr("y", -10)
             .attr("font-weight", "bold")
             .text("Region");  
- 
+
+      // sort the data alphabetically
+      data = JSON.parse(JSON.stringify(original_data));
+      data.sort(function(a,b) {
+        return d3.descending(a.USCity, b.USCity);
+      });
                        
       var svg2 = d3.select("svg.svg2");
  
@@ -827,7 +832,11 @@
       regions_specific = regions[regionName];
       updateVisualization0(filteredData, regionName);
       updateVisualization(filteredData, regionName);
-      updateVisualization2(original_data, regions_specific);
+      data = JSON.parse(JSON.stringify(original_data));
+      data.sort(function(a,b) {
+        return d3.descending(a.USCity, b.USCity);
+      });
+      updateVisualization2(data, regions_specific);
     }
    
     function sortingChange(sortingMethod, regionName) {
