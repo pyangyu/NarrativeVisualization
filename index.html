@@ -102,9 +102,10 @@
           <svg class="svg1_region"></svg>
       </div>
  
-      <div class="reset_button">
+      <!-- delete the reset-button because it is not useful by resetting to dataset order -->
+      <!-- <div class="reset_button">
         <button onclick="resetData()">Reset</button>
-      </div>
+      </div> -->
       <div id="sortButton" class="flex-container">
         <div class="button-container">
           <p>Sort by AnnualChange</p>
@@ -114,7 +115,7 @@
           </div>
         </div>
         <div class="button-container">
-          <p>Sort Alphabetically</p>
+          <p>Sort Alphabetically (default)</p>
           <div class="nested-buttons">
               <button onclick="sortingChange('SortByAlphabeticUp','')">Sort Alphabetically a → z</button>
               <button onclick="sortingChange('SortByAlphabeticDown','')">Sort Alphabetically z → a</button>
@@ -595,6 +596,56 @@
     //                                              Define update function                                      //
     //                                                                                                          //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function updateVisualization0(filteredData, nestRegion) {
+      var svg0 = d3.select("svg.svg0");
+
+      svg0.selectAll("circle").remove();
+
+      var x = d3.scaleLog()
+              .range([0, 860])
+              .domain([6, 1500]);
+
+      var y = d3.scaleLog()
+                .range([400, 0])
+                .domain([90000, 7000000]);
+                
+      var gPoints = svg0.append("g")
+                      .attr("transform", "translate(50, 50)");
+
+      var tooltip = d3.select("#tooltip0");
+
+      gPoints.selectAll(".circle")
+        .data(filteredData)
+        .enter().append("circle")
+        .attr("cx", function(d) { return x(d.Area); })
+        .attr("cy", function(d) { return y(d.Population2020); })
+        .attr("r", function(d) { return 2; })
+        .attr("fill", function(d) {
+          if(nestRegion == "Pacific States") return "#FF8C00";
+          if(nestRegion == "Mountain States") return "#ADFF2F";
+          if(nestRegion == "East North Central") return "#F08080";
+          if(nestRegion == "West North Central") return "#90EE90";
+          if(nestRegion == "Northeast") return "#86F4FF";
+          if(nestRegion == "South Atlantic") return "#20B2AA";
+          if(nestRegion == "East South Central") return "#B496FF";
+          if(nestRegion == "West South Central") return "#23E9A7";
+          return checkCity(d.USState);
+        })
+        .on("click", d => circleClick(d))
+        .on('mouseover', function(d,i) {
+          tooltip.style("opacity", 0.8)
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY) + "px")
+          .html(d.USCity + '\n' + d.USState + '\n' + d.Density)
+        })
+        .on('mouseout', function() {
+          tooltip.style("opacity", 0)
+        })
+        .transition().duration(3000).delay(1000)
+        .attr("r", function(d) { if(nestRegion == "whole") return Math.pow(d.Density, 1/4.2); return Math.pow(d.Density, 1/3.7); });
+      }
+    
+    
     function updateVisualization(filteredData, nestRegion) {
         var svg1 = d3.select("svg.svg1");
  
@@ -666,41 +717,41 @@
       .domain(filteredData.map(function(d) {return d.USCity + ", " + d.USState;}))
             .padding(0.1);
             
-            var gPoints2 = svg2.append("g")
-            .attr("transform", "translate(50, 50)");
-            
-            gPoints2.selectAll(".rect")
-            .data(filteredData)
-            .enter().append("rect")
-            .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
-            .attr("y", function(d) { return y2(d.USCity + ", " + d.USState); })
-            .attr("width", function(d) { return 0; })
-            .on("click", d => rectClick(d))
-            .on('mouseover', function(d,i) {
-              tooltip2.style("opacity", 0.8)
-              .style("left", (d3.event.pageX) + "px")
-              .style("top", (d3.event.pageY) + "px")
-              .html(d.AnnualChange)
-            })
-            .on('mouseout', function() {
-              tooltip2.style("opacity", 0)
-            })
-            .transition().duration(3000).delay(1000)
-            .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
-            .attr("height", y2.bandwidth())
-            .attr("r", function(d) { return 10; })
-            .attr("fill", function(d) {if(!nestRegion.includes(d.USState)) return "#EAEEEC"; if(d.AnnualChange < 0) return "#A51505"; return "#028017";});
-            
-            var gYAxes2 = svg2.append("g")
-            .attr("class", "gY2")
-            .attr("transform", "translate(480, 50)")
-            .call(d3.axisLeft(y2).tickPadding(10)
-            .tickSize(0));
-            
-            gYAxes2.selectAll(".tick text")
-            .attr("class", "gY2-text")
-            .attr("x", -450)
-            .style("text-anchor", "start");
+      var gPoints2 = svg2.append("g")
+      .attr("transform", "translate(50, 50)");
+      
+      gPoints2.selectAll(".rect")
+      .data(filteredData)
+      .enter().append("rect")
+      .attr("x", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2(0) - x2_positive(parseFloat(-d.AnnualChange)); return x2(0);})
+      .attr("y", function(d) { return y2(d.USCity + ", " + d.USState); })
+      .attr("width", function(d) { return 0; })
+      .on("click", d => rectClick(d))
+      .on('mouseover', function(d,i) {
+        tooltip2.style("opacity", 0.8)
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY) + "px")
+        .html(d.AnnualChange)
+      })
+      .on('mouseout', function() {
+        tooltip2.style("opacity", 0)
+      })
+      .transition().duration(3000).delay(1000)
+      .attr("width", function(d) { if(parseFloat(d.AnnualChange) < 0) return x2_positive(parseFloat(-d.AnnualChange)); return x2_positive(parseFloat(d.AnnualChange)); })
+      .attr("height", y2.bandwidth())
+      .attr("r", function(d) { return 10; })
+      .attr("fill", function(d) {if(!nestRegion.includes(d.USState)) return "#EAEEEC"; if(d.AnnualChange < 0) return "#A51505"; return "#028017";});
+      
+      var gYAxes2 = svg2.append("g")
+      .attr("class", "gY2")
+      .attr("transform", "translate(480, 50)")
+      .call(d3.axisLeft(y2).tickPadding(10)
+      .tickSize(0));
+      
+      gYAxes2.selectAll(".tick text")
+      .attr("class", "gY2-text")
+      .attr("x", -450)
+      .style("text-anchor", "start");
     }
    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -748,6 +799,7 @@
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function clearData() {
       clickButton("");
+      updateVisualization0(original_data, "whole");
       updateVisualization(original_data, "whole");
       regions_specific= wholeUS;
       updateVisualization2(original_data, regions_specific);
@@ -773,6 +825,7 @@
      
       const filteredData = filterByRegion(regions[regionName]);
       regions_specific = regions[regionName];
+      updateVisualization0(filteredData, regionName);
       updateVisualization(filteredData, regionName);
       updateVisualization2(original_data, regions_specific);
     }
@@ -809,9 +862,10 @@
       updateVisualization2(data, regions_specific);
     }
  
-    function resetData() {
-      updateVisualization2(original_data, regions_specific);
-    }
+    // delete the resetData() function because ranking according to the dataset is non-sense
+    // function resetData() {
+    //   updateVisualization2(original_data, regions_specific);
+    // }
 
     function clickButton(stringArray) {
       const container = d3.select(".svg-popup-container");
