@@ -175,6 +175,42 @@
 
     let regions_specific= wholeUS;
 
+    // annotation
+    let annotations_svg0 = [];
+    let annotations_svg1 = [];
+    let annotations_svg2 = [];
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                          //
+    //                                        annotation function                                               //
+    //                                                                                                          //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function wrapText(text, string, width) {
+        const words = string.split(/\s+/).reverse();
+        let word;
+        let line = [];
+        let lineNumber = 0;
+        const lineHeight = 1.2; // ems
+        const y = text.attr("y");
+        const dy = parseFloat(text.attr("dy") || 0);
+        let tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan")
+                            .attr("x", 0)
+                            .attr("y", y)
+                            .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                            .text(word);
+            }
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                                          //
     //                                        Define tooltip function                                           //
@@ -261,7 +297,10 @@
     async function init() {
       original_data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
       let data = original_data;
- 
+
+      let maxRow = original_data.reduce((max, row) => row.density > max.density ? row : max, original_data[0]);
+      let minRow = original_data.reduce((min, row) => row.density < min.density ? row : min, original_data[0]);
+
       var data_region = [
           { region: "Western States", color: "#2222D2" },
           { region: "Pacific States", color: "#FF8C00" },
@@ -380,6 +419,44 @@
       .attr("x", -220)
       .attr("y", 15)
       .text("Population");
+
+      let newAnnotation = {
+        text: "Annotations :)\nLonger text to show text wrapping",
+        textWidth: 100,
+        x: x0(maxRow.Area),
+        y: y0(maxRow.Population2020),
+        dx: 50,
+        dy: -10
+      };
+
+      annotations_svg0.push(newAnnotation);
+
+      annotations_svg0.forEach(anno => {
+          const g = svg0.append("g")
+                      .attr("class", "annotation")
+                      .attr("transform", "translate(60, 50)");
+      
+          // Draw the line
+          g.append("line")
+          .attr("x1", anno.x)
+          .attr("y1", anno.y)
+          .attr("x2", anno.x + anno.dx)
+          .attr("y2", anno.y + anno.dy)
+          .attr("stroke", "#E8336D")
+          .attr("stroke-width", 2);
+
+          // Add text
+          const text = g.append("text")
+              .attr("x", anno.x + anno.dx)
+              .attr("y", anno.y + anno.dy)
+              .attr("fill", "#E8336D")
+              .attr("font-size", "14px")
+              .attr("font-family", "Arial")
+              .attr("text-anchor", "start");
+
+          // Apply text wrapping
+          wrapText(text, anno.text, anno.textWidth);
+      });
 
  
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
