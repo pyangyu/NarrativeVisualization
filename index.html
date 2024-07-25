@@ -185,29 +185,23 @@
     //                                        annotation function                                               //
     //                                                                                                          //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    function wrapText(text, string, width) {
-        const words = string.split(/\s+/).reverse();
-        let word;
-        let line = [];
+    function wrapText(text, string, currentX, currentY, direction) {
+        const words = string.split(/\n/);
+        // console.log(words);
         let lineNumber = 0;
         const lineHeight = 1.2; // ems
-        const y = text.attr("y");
+        // const y = text.attr("y");
         const dy = parseFloat(text.attr("dy") || 0);
-        let tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-    
-        while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
-                line.pop();
-                tspan.text(line.join(" "));
-                line = [word];
-                tspan = text.append("tspan")
-                            .attr("x", 0)
-                            .attr("y", y)
-                            .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                            .text(word);
-            }
+
+        let xOffset = 10;
+        if(direction == 1) xOffset += 60;
+
+        for (let i = 0; i < words.length; i++) {
+          text.append("tspan")
+              .attr("x", currentX - xOffset)
+              .attr("y", currentY)
+              .attr("dy", ++lineNumber * lineHeight + dy + "em")
+              .text(words[i]);
         }
     }
 
@@ -298,8 +292,8 @@
       original_data = await d3.csv('https://raw.githubusercontent.com/pyangyu/NarrativeVisualization/main/data/PopulationOfAllUSCities2024.csv');
       let data = original_data;
 
-      let maxRow = original_data.reduce((max, row) => row.density > max.density ? row : max, original_data[0]);
-      let minRow = original_data.reduce((min, row) => row.density < min.density ? row : min, original_data[0]);
+      let maxRow = data.reduce((max, row) => parseFloat(row.Density) > parseFloat(max.Density) ? row : max, data[0]);
+      let minRow = data.reduce((min, row) => parseFloat(row.Density) < parseFloat(min.Density) ? row : min, data[0]);
 
       var data_region = [
           { region: "Western States", color: "#2222D2" },
@@ -421,13 +415,24 @@
       .text("Population");
 
       let newAnnotation = {
-        text: "Annotations :)\nLonger text to show text wrapping",
-        textWidth: 100,
+        text: "City with highest density:\n" + printAnnotation(maxRow),
         x: x0(maxRow.Area),
         y: y0(maxRow.Population2020),
-        dx: 50,
-        dy: -10
+        dx: 40,
+        dy: -20,
+        direction: 'upperRight'
       };
+
+      annotations_svg0.push(newAnnotation);
+
+      newAnnotation = {
+        text: "City with lowest density:\n" + printAnnotation(minRow),
+        x: x0(minRow.Area),
+        y: y0(minRow.Population2020),
+        dx: -40,
+        dy: -20,
+        direction: 'upperLeft'
+      }
 
       annotations_svg0.push(newAnnotation);
 
@@ -435,27 +440,47 @@
           const g = svg0.append("g")
                       .attr("class", "annotation")
                       .attr("transform", "translate(60, 50)");
+
+          let direction = 0;
+          if(anno.direction == 'upperLeft') direction = 1;
+          if(anno.direction == 'lowerRight') direction = 2;
+          if(anno.direction == 'lowerLeft') direction = 3;
+
+          console.log(direction);
       
           // Draw the line
           g.append("line")
           .attr("x1", anno.x)
           .attr("y1", anno.y)
-          .attr("x2", anno.x + anno.dx)
-          .attr("y2", anno.y + anno.dy)
-          .attr("stroke", "#E8336D")
-          .attr("stroke-width", 2);
+          .attr("x2", anno.x + anno.dx / 2)
+          .attr("y2", anno.y + anno.dy / 2)
+          .attr("stroke", "#161847")
+          .attr("stroke-width", 1.2);
+
+          // Draw the line
+          g.append("line")
+          .attr("x1", anno.x + anno.dx / 2)
+          .attr("y1", anno.y + anno.dy / 2)
+          .attr("x2", anno.x + anno.dx + anno.dx / 2)
+          .attr("y2", anno.y + anno.dy / 2)
+          .attr("stroke", "#161847")
+          .attr("stroke-width", 1.2);
 
           // Add text
           const text = g.append("text")
-              .attr("x", anno.x + anno.dx)
+              .attr("x", function() {
+                if(direction == 1)
+                  return anno.x + anno.dx - 30; 
+                return anno.x + anno.dx;
+              })
               .attr("y", anno.y + anno.dy)
-              .attr("fill", "#E8336D")
-              .attr("font-size", "14px")
+              .attr("fill", "#495052")
+              .attr("font-size", "0.5em")
               .attr("font-family", "Arial")
               .attr("text-anchor", "start");
 
           // Apply text wrapping
-          wrapText(text, anno.text, anno.textWidth);
+          wrapText(text, anno.text, anno.x + anno.dx + anno.dx / 2, anno.y + anno.dy / 2, direction);
       });
 
  
@@ -559,6 +584,76 @@
             .attr("x", -220)
             .attr("y", 15)
             .text("Population");
+
+        newAnnotation = {
+          text: "City with highest density:\n" + printAnnotation(maxRow),
+          x: x(maxRow.Area),
+          y: y(maxRow.Population2024),
+          dx: 40,
+          dy: -20,
+          direction: 'upperRight'
+        };
+    
+        annotations_svg1.push(newAnnotation);
+    
+        newAnnotation = {
+          text: "City with lowest density:\n" + printAnnotation(minRow),
+          x: x(minRow.Area),
+          y: y(minRow.Population2024),
+          dx: -40,
+          dy: -20,
+          direction: 'upperLeft'
+        }
+    
+        annotations_svg1.push(newAnnotation);
+    
+        annotations_svg1.forEach(anno => {
+            const g = svg.append("g")
+                        .attr("class", "annotation")
+                        .attr("transform", "translate(60, 50)");
+    
+            let direction = 0;
+            if(anno.direction == 'upperLeft') direction = 1;
+            if(anno.direction == 'lowerRight') direction = 2;
+            if(anno.direction == 'lowerLeft') direction = 3;
+    
+            console.log(direction);
+        
+            // Draw the line
+            g.append("line")
+            .attr("x1", anno.x)
+            .attr("y1", anno.y)
+            .attr("x2", anno.x + anno.dx / 2)
+            .attr("y2", anno.y + anno.dy / 2)
+            .attr("stroke", "#161847")
+            .attr("stroke-width", 1.2);
+    
+            // Draw the line
+            g.append("line")
+            .attr("x1", anno.x + anno.dx / 2)
+            .attr("y1", anno.y + anno.dy / 2)
+            .attr("x2", anno.x + anno.dx + anno.dx / 2)
+            .attr("y2", anno.y + anno.dy / 2)
+            .attr("stroke", "#161847")
+            .attr("stroke-width", 1.2);
+    
+            // Add text
+            const text = g.append("text")
+                .attr("x", function() {
+                  if(direction == 1)
+                    return anno.x + anno.dx - 30; 
+                  return anno.x + anno.dx;
+                })
+                .attr("y", anno.y + anno.dy)
+                .attr("fill", "#495052")
+                .attr("font-size", "0.5em")
+                .attr("font-family", "Arial")
+                .attr("text-anchor", "start");
+    
+            // Apply text wrapping
+            wrapText(text, anno.text, anno.x + anno.dx + anno.dx / 2, anno.y + anno.dy / 2, direction);
+        });
+        
  
  
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -841,6 +936,11 @@
     //                                              Define helper function                                      //
     //                                                                                                          //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function printAnnotation(d, svgScene) {
+      return "City Name: " + d.USCity + "\nState: " + d.USState + "\nThe area of the city is: " + d.Area + "\nThe population in 2020: " + d.Population2020 + "\nThe population in 2024: " + d.Population2024 + "\nThe current opulation density is: " + d.Density + "\n";
+    }
+
+
     function checkCity(cityState) {
       const regions = {
         'Western States': westernStates,
