@@ -446,8 +446,6 @@
           if(anno.direction == 'lowerRight') direction = 2;
           if(anno.direction == 'lowerLeft') direction = 3;
 
-          console.log(direction);
-      
           // Draw the line
           g.append("line")
           .attr("x1", anno.x)
@@ -468,6 +466,7 @@
 
           // Add text
           const text = g.append("text")
+              .attr("class", "annotation-text")
               .attr("x", function() {
                 if(direction == 1)
                   return anno.x + anno.dx - 30; 
@@ -616,8 +615,6 @@
             if(anno.direction == 'upperLeft') direction = 1;
             if(anno.direction == 'lowerRight') direction = 2;
             if(anno.direction == 'lowerLeft') direction = 3;
-    
-            console.log(direction);
         
             // Draw the line
             g.append("line")
@@ -776,6 +773,9 @@
     function updateVisualization0(filteredData, nestRegion) {
       var svg0 = d3.select("svg.svg0");
 
+      // remove the annotation
+      svg0.selectAll(".annotation").remove();
+      
       svg0.selectAll("circle").remove();
 
       var x = d3.scaleLog()
@@ -787,7 +787,7 @@
                 .domain([90000, 7000000]);
                 
       var gPoints = svg0.append("g")
-                      .attr("transform", "translate(50, 50)");
+                      .attr("transform", "translate(60, 50)");
 
       var tooltip = d3.select("#tooltip0");
 
@@ -820,11 +820,92 @@
         })
         .transition().duration(3000).delay(1000)
         .attr("r", function(d) { if(nestRegion == "whole") return Math.pow(d.Density, 1/4.2); return Math.pow(d.Density, 1/3.7); });
+
+        // find new max and min
+        let maxRow = filteredData.reduce((max, row) => parseFloat(row.Density) > parseFloat(max.Density) ? row : max, filteredData[0]);
+        let minRow = filteredData.reduce((min, row) => parseFloat(row.Density) < parseFloat(min.Density) ? row : min, filteredData[0]);
+
+        let shift = 0;
+        let offY = 0;
+        if(nestRegion == "East South Central" || nestRegion == "West South Central") shift = 1;
+        if(nestRegion == "Mountain States") offY = -40;
+        // use filter data to do the annotation
+        let newAnnotation = {
+          text: "City with highest density:\n" + printAnnotation(maxRow),
+          x: x(maxRow.Area),
+          y: y(maxRow.Population2020),
+          dx: shift == 0 ? 40 : -40,
+          dy: -20 + offY,
+          direction: shift == 0 ? 'upperRight' : 'upperLeft'
+        };
+
+        annotations_svg0 = [];
+  
+        annotations_svg0.push(newAnnotation);
+  
+        newAnnotation = {
+          text: "City with lowest density:\n" + printAnnotation(minRow),
+          x: x(minRow.Area),
+          y: y(minRow.Population2020),
+          dx: shift == 0 ? -40 : 40,
+          dy: -20 + offY,
+          direction: shift == 0 ? 'upperLeft' : 'upperRight'
+        }
+  
+        annotations_svg0.push(newAnnotation);
+  
+        annotations_svg0.forEach(anno => {
+            const g = svg0.append("g")
+                        .attr("class", "annotation")
+                        .attr("transform", "translate(60, 50)");
+  
+            let direction = 0;
+            if(anno.direction == 'upperLeft') direction = 1;
+            if(anno.direction == 'lowerRight') direction = 2;
+            if(anno.direction == 'lowerLeft') direction = 3;
+        
+            // Draw the line
+            g.append("line")
+            .attr("x1", anno.x)
+            .attr("y1", anno.y)
+            .attr("x2", anno.x + anno.dx / 2)
+            .attr("y2", anno.y + anno.dy / 2)
+            .attr("stroke", "#161847")
+            .attr("stroke-width", 1.2);
+  
+            // Draw the line
+            g.append("line")
+            .attr("x1", anno.x + anno.dx / 2)
+            .attr("y1", anno.y + anno.dy / 2)
+            .attr("x2", anno.x + anno.dx + anno.dx / 2)
+            .attr("y2", anno.y + anno.dy / 2)
+            .attr("stroke", "#161847")
+            .attr("stroke-width", 1.2);
+  
+            // Add text
+            const text = g.append("text")
+                .attr("x", function() {
+                  if(direction == 1)
+                    return anno.x + anno.dx - 30; 
+                  return anno.x + anno.dx;
+                })
+                .attr("y", anno.y + anno.dy)
+                .attr("fill", "#495052")
+                .attr("font-size", "0.5em")
+                .attr("font-family", "Arial")
+                .attr("text-anchor", "start");
+  
+            // Apply text wrapping
+            wrapText(text, anno.text, anno.x + anno.dx + anno.dx / 2, anno.y + anno.dy / 2, direction);
+        });
       }
     
     
     function updateVisualization(filteredData, nestRegion) {
         var svg1 = d3.select("svg.svg1");
+
+        // remove the annotation
+        svg1.selectAll(".annotation").remove();
  
         svg1.selectAll("circle").remove();
  
@@ -837,7 +918,7 @@
                   .domain([90000, 7000000]);
                   
         var gPoints = svg1.append("g")
-                        .attr("transform", "translate(50, 50)");
+                        .attr("transform", "translate(60, 50)");
  
         var tooltip = d3.select("#tooltip");
  
@@ -870,6 +951,84 @@
           })
           .transition().duration(3000).delay(1000)
           .attr("r", function(d) { if(nestRegion == "whole") return Math.pow(d.Density, 1/4.2); return Math.pow(d.Density, 1/3.7); });
+
+          // find new max and min
+        let maxRow = filteredData.reduce((max, row) => parseFloat(row.Density) > parseFloat(max.Density) ? row : max, filteredData[0]);
+        let minRow = filteredData.reduce((min, row) => parseFloat(row.Density) < parseFloat(min.Density) ? row : min, filteredData[0]);
+
+        let shift = 0;
+        let offY = 0;
+        if(nestRegion == "East South Central" || nestRegion == "West South Central") shift = 1;
+        if(nestRegion == "Mountain States") offY = -40;
+        // use filter data to do the annotation
+        let newAnnotation = {
+          text: "City with highest density:\n" + printAnnotation(maxRow),
+          x: x(maxRow.Area),
+          y: y(maxRow.Population2024),
+          dx: shift == 0 ? 40 : -40,
+          dy: -20 + offY,
+          direction: shift == 0 ? 'upperRight' : 'upperLeft'
+        };
+
+        annotations_svg1 = [];
+  
+        annotations_svg1.push(newAnnotation);
+  
+        newAnnotation = {
+          text: "City with lowest density:\n" + printAnnotation(minRow),
+          x: x(minRow.Area),
+          y: y(minRow.Population2024),
+          dx: shift == 0 ? -40 : 40,
+          dy: -20 + offY,
+          direction: shift == 0 ? 'upperLeft' : 'upperRight'
+        }
+  
+        annotations_svg1.push(newAnnotation);
+  
+        annotations_svg1.forEach(anno => {
+            const g = svg1.append("g")
+                        .attr("class", "annotation")
+                        .attr("transform", "translate(60, 50)");
+  
+            let direction = 0;
+            if(anno.direction == 'upperLeft') direction = 1;
+            if(anno.direction == 'lowerRight') direction = 2;
+            if(anno.direction == 'lowerLeft') direction = 3;
+        
+            // Draw the line
+            g.append("line")
+            .attr("x1", anno.x)
+            .attr("y1", anno.y)
+            .attr("x2", anno.x + anno.dx / 2)
+            .attr("y2", anno.y + anno.dy / 2)
+            .attr("stroke", "#161847")
+            .attr("stroke-width", 1.2);
+  
+            // Draw the line
+            g.append("line")
+            .attr("x1", anno.x + anno.dx / 2)
+            .attr("y1", anno.y + anno.dy / 2)
+            .attr("x2", anno.x + anno.dx + anno.dx / 2)
+            .attr("y2", anno.y + anno.dy / 2)
+            .attr("stroke", "#161847")
+            .attr("stroke-width", 1.2);
+  
+            // Add text
+            const text = g.append("text")
+                .attr("x", function() {
+                  if(direction == 1)
+                    return anno.x + anno.dx - 30; 
+                  return anno.x + anno.dx;
+                })
+                .attr("y", anno.y + anno.dy)
+                .attr("fill", "#495052")
+                .attr("font-size", "0.5em")
+                .attr("font-family", "Arial")
+                .attr("text-anchor", "start");
+  
+            // Apply text wrapping
+            wrapText(text, anno.text, anno.x + anno.dx + anno.dx / 2, anno.y + anno.dy / 2, direction);
+        });
         }
             
     function updateVisualization2(filteredData, nestRegion) {
@@ -937,7 +1096,10 @@
     //                                                                                                          //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function printAnnotation(d, svgScene) {
-      return "City Name: " + d.USCity + "\nState: " + d.USState + "\nThe area of the city is: " + d.Area + "\nThe population in 2020: " + d.Population2020 + "\nThe population in 2024: " + d.Population2024 + "\nThe current opulation density is: " + d.Density + "\n";
+      // if(svgScene == 1) return "City Name: " + d.USCity + "\nState: " + d.USState + "\nThe area of the city is: " + d.Area + "\nThe population in 2020: " + d.Population2020 + "\nThe current population density is: " + d.Density + "\n";
+      // if(svgScene == 2) return "City Name: " + d.USCity + "\nState: " + d.USState + "\nThe area of the city is: " + d.Area + "\nThe population in 2024: " + d.Population2024 + "\nThe current population density is: " + d.Density + "\n";
+      if(svgScene == 2) return "City Name: " + d.USCity + "\nState: " + d.USState + "\nThe area of the city is: " + d.Area + "\nThe population in 2020: " + d.Population2020 + "\nThe population in 2024: " + d.Population2024 + "\nAnnual change from 2020 to 2024: " + d.AnnualChange + "\n";
+      return "City Name: " + d.USCity + "\nState: " + d.USState + "\nThe area of the city is: " + d.Area + "\nThe population in 2020: " + d.Population2020 + "\nThe population in 2024: " + d.Population2024 + "\nThe current population density is: " + d.Density + "\n";
     }
 
 
@@ -1103,17 +1265,111 @@
              .attr("height", newHeight);
   
           container.style("display", "block");
-      }
-  }  
+        }
+    }  
 
   function circleClick(d) {
-    alert("here");
-    // alert(d.USCity + " " + d.USState + " " + d.Population2024 + " " + d.Population2020 + " " + d.AnnualChange + " " + d.Density);
+    const container = d3.select(".svg-popup-container");
+    const svg = d3.select(".clickShowText");
+
+    if(d != undefined) {
+        container.selectAll("button").remove();
+        svg.selectAll("*").remove();
+
+        var myButton = container.append("button")
+                                .style("color", "red")
+                                .style("position", "absolute")
+                                .style("left", "210px")
+                                .style("top", "2px")
+                                .text("X")
+                                .on("click", function() {
+                                  svg.selectAll("*").remove();
+                                  container.style("display", "none");
+                                });
+
+        let stringArray = printAnnotation(d).split('\n');
+        var texts = svg.selectAll("text")
+                       .data(stringArray, (d) => d);
+
+        texts.enter()
+              .append("text")
+              .attr("x", 5)
+              .attr("y", 20)
+              .text("The selected groups includes\n");
+                      
+        texts.enter()
+             .append("text")
+             .attr("x", 10)
+             .attr("y", (d, i) => 20 + 20 * (i + 1))
+             .text(d => d)
+             .attr("font-size", "0.5em")
+             .transition().duration(2000).delay(200)
+             .attr("font-size", "1.1em");
+
+        // Exit and remove old texts
+        texts.exit().remove();
+
+        const numItems = stringArray.length;
+        const newHeight = numItems * 20 + 30;
+        const newWidth = 200;
+
+        svg.attr("width", newWidth)
+           .attr("height", newHeight);
+
+        container.style("display", "block");
+      }
   }
 
   function rectClick(d) {
-    alert("here");
-    // alert(d.USCity + " " + d.USState + " " + d.Population2024 + " " + d.Population2020 + " " + d.AnnualChange + " " + d.Density);
+    const container = d3.select(".svg-popup-container");
+    const svg = d3.select(".clickShowText");
+
+    if(d != undefined) {
+        container.selectAll("button").remove();
+        svg.selectAll("*").remove();
+
+        var myButton = container.append("button")
+                                .style("color", "red")
+                                .style("position", "absolute")
+                                .style("left", "210px")
+                                .style("top", "2px")
+                                .text("X")
+                                .on("click", function() {
+                                  svg.selectAll("*").remove();
+                                  container.style("display", "none");
+                                });
+
+        let stringArray = printAnnotation(d, 2).split('\n');
+        var texts = svg.selectAll("text")
+                       .data(stringArray, (d) => d);
+
+        texts.enter()
+              .append("text")
+              .attr("x", 5)
+              .attr("y", 20)
+              .text("The selected groups includes\n");
+                      
+        texts.enter()
+             .append("text")
+             .attr("x", 10)
+             .attr("y", (d, i) => 20 + 20 * (i + 1))
+             .text(d => d)
+             .attr("font-size", "0.5em")
+             .transition().duration(2000).delay(200)
+             .attr("font-size", "1.1em");
+
+        // Exit and remove old texts
+        texts.exit().remove();
+
+        const numItems = stringArray.length;
+        const newHeight = numItems * 20 + 30;
+        const newWidth = 200;
+
+        svg.attr("width", newWidth)
+           .attr("height", newHeight);
+
+        container.style("display", "block");
+      }
   }
 
   function renderSceneOne() {
