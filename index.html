@@ -239,47 +239,55 @@
     //                                                                                                          //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function highlight(d, svgNumber) {
-      d3.selectAll(".bubbles").style("opacity", 0.05)
-      switch(d.region) {
-        case "Western States":
-          for(x in westernStates) { d3.selectAll("."+westernStates[x]).style("opacity",1) }
-        break;
-        case "Pacific States":
-          for(x in pacificStates) { d3.selectAll("."+pacificStates[x]).style("opacity",1) }
-        break;
-        case "Mountain States":
-          for(x in mountainStates) { d3.selectAll("."+mountainStates[x]).style("opacity",1) }
-        break;
-        case "Midwestern States":
-          for(x in midwesternStates) { d3.selectAll("."+midwesternStates[x]).style("opacity",1) }
-        break;
-        case "East North Central":
-          for(x in eastNorthCentral) { d3.selectAll("."+eastNorthCentral[x]).style("opacity",1) }
-        break;
-        case "West North Central":
-          for(x in westNorthCentral) { d3.selectAll("."+westNorthCentral[x]).style("opacity",1) }
-        break;
-        case "Eastern States":
-          for(x in easternStates) { d3.selectAll("."+easternStates[x]).style("opacity",1) }
-        break;
-        case "Northeast":
-          for(x in northeast) { d3.selectAll("."+northeast[x]).style("opacity",1) }
-        break;
-        case "South Atlantic":
-          for(x in southAtlantic) { d3.selectAll("."+southAtlantic[x]).style("opacity",1) }
-        break;
-        case "Southern States":
-          for(x in southernStates) { d3.selectAll("."+southernStates[x]).style("opacity",1) }
-        break;
-        case "East South Central":
-          for(x in eastSouthCentral) { d3.selectAll("."+eastSouthCentral[x]).style("opacity",1) }
-        break;
-        case "West South Central":
-          for(x in westSouthCentral) { d3.selectAll("."+westSouthCentral[x]).style("opacity",1) }
-        break;
-        default: break;
-      }
+        d3.selectAll(".bubbles").style("opacity", 0.05);
+        let stateArray;
+        switch(d.region) {
+            case "Western States":
+                stateArray = westernStates;
+                break;
+            case "Pacific States":
+                stateArray = pacificStates;
+                break;
+            case "Mountain States":
+                stateArray = mountainStates;
+                break;
+            case "Midwestern States":
+                stateArray = midwesternStates;
+                break;
+            case "East North Central":
+                stateArray = eastNorthCentral;
+                break;
+            case "West North Central":
+                stateArray = westNorthCentral;
+                break;
+            case "Eastern States":
+                stateArray = easternStates;
+                break;
+            case "Northeast":
+                stateArray = northeast;
+                break;
+            case "South Atlantic":
+                stateArray = southAtlantic;
+                break;
+            case "Southern States":
+                stateArray = southernStates;
+                break;
+            case "East South Central":
+                stateArray = eastSouthCentral;
+                break;
+            case "West South Central":
+                stateArray = westSouthCentral;
+                break;
+            default: 
+                return; 
+        }
+    
+        // Highlight the states based on the selected region
+        stateArray.forEach(state => {
+            d3.selectAll("." + state.replace(/\s+/g, '-')).style("opacity", 1);
+        });
     }
+  
 
     function noHighlight(d, svgNumber) {
       d3.selectAll(".bubbles").style("opacity", 1);
@@ -377,7 +385,11 @@
       gPoints0.selectAll(".circle")
         .data(data)
         .enter().append("circle")
-        .attr("class", function(d) { return "bubbles " + d.USState; })
+        .attr("class", function(d) {
+            let className = "bubbles " + (d.USState ? d.USState.replace(/\s+/g, '-') : "undefined-state");
+            // console.log(className);  // add hyphon
+            return className;
+        })
         .attr("cx", function(d) { return x0(d.Area); })
         .attr("cy", function(d) { return y0(d.Population2020); })
         .attr("r", function(d) { return 2; })
@@ -546,7 +558,11 @@
       gPoints.selectAll(".circle")
         .data(data)
         .enter().append("circle")
-        .attr("class", function(d) { return "bubbles " + d.USState; })
+        .attr("class", function(d) {
+            let className = "bubbles " + (d.USState ? d.USState.replace(/\s+/g, '-') : "undefined-state");
+            // console.log(className);  // add hyphon
+            return className;
+        })
         .attr("cx", function(d) { return x(d.Area); })
         .attr("cy", function(d) { return y(d.Population2024); })
         .attr("r", function(d) { return 2; })
@@ -794,6 +810,11 @@
       gPoints.selectAll(".circle")
         .data(filteredData)
         .enter().append("circle")
+        .attr("class", function(d) {
+            let className = "bubbles " + (d.USState ? d.USState.replace(/\s+/g, '-') : "undefined-state");
+            // console.log(className);  // add hyphon
+            return className;
+        })
         .attr("cx", function(d) { return x(d.Area); })
         .attr("cy", function(d) { return y(d.Population2020); })
         .attr("r", function(d) { return 2; })
@@ -925,6 +946,11 @@
         gPoints.selectAll(".circle")
           .data(filteredData)
           .enter().append("circle")
+          .attr("class", function(d) {
+              let className = "bubbles " + (d.USState ? d.USState.replace(/\s+/g, '-') : "undefined-state");
+              // console.log(className);  // add hyphon
+              return className;
+          })
           .attr("cx", function(d) { return x(d.Area); })
           .attr("cy", function(d) { return y(d.Population2024); })
           .attr("r", function(d) { return 2; })
